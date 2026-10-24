@@ -1,3 +1,9 @@
+"""Legacy exploratory formulas, retained for notebook compatibility.
+
+Not a validated official AQI implementation. Verify pollutant-specific averaging
+periods, units/precision and breakpoint version before reuse. See docs/data.md.
+"""
+
 # Define AQI Calculation for Each Pollutant
 def calculate_pm25_aqi(pm25):
     """ Calculate AQI for PM2.5 """
