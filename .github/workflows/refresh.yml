@@ -7,6 +7,9 @@ on:
     branches: [main]
     paths:
       - operations.py
+      - aqi.py
+      - aqi_data.py
+      - data_sources.py
       - extend_data.py
       - etl_contract.py
       - forecast.py
@@ -14,6 +17,8 @@ on:
       - forecast_weather.py
       - weather_model.py
       - uncertainty.py
+      - requirements-tested.txt
+      - reports/workflow/run.json
       - reports/uncertainty/**
       - .github/workflows/refresh.yml
 permissions:
