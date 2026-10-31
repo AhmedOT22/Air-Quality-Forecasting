@@ -1,6 +1,6 @@
-# AQI dataset: restored main objective
+# AQI dataset and pandas preparation
 
-The pollution-only concentration dataset above is now supplementary. The main input
+The pollution-only concentration dataset is supplementary. The main input
 is `data/processed/daily_aqi.csv`, created by `aqi_data.py` through the default
 `python data_sources.py` command. It includes the original four pollutants: PM2.5,
 O3, NO2 and SO2. All four use Toronto West NAPS 060430. The gas exports do not
@@ -15,15 +15,23 @@ This is a **four-pollutant US EPA-based reconstruction**, retaining the original
 project scope. It is not Canada's AQHI and not an officially reported full city AQI.
 CO and PM10 are not included. A broader official reporting-area index may differ.
 
-The default `epa_2018` uses the version published in EPA 454/B-18-007, consistent
-with the PM2.5 breakpoint family in the original notebook. The alternative
-`epa_2024` follows the May 2024 PM2.5 breakpoints and is saved as `AQI_epa_2024`.
-Both apply one fixed definition to the whole archive; no hidden mid-series switch
-is made. This is a retrospective harmonized index, not a claim to reproduce the
-exact index published on every historical date.
+The default `epa_2024` applies the 2024 PM2.5 breakpoints to every archive year.
+The alternative `epa_2018` is saved as `AQI_epa_2018`. This is a retrospective
+harmonized index, not a claim to reproduce the index published on each historical
+date. No breakpoint switch is introduced in the middle of the series.
+
+The existing pandas preparation path is retained: `read_hourly` normalizes station
+IDs, melts H01–H24 columns, rejects invalid readings and reindexes the full hourly
+calendar. `daily_aqi` groups qualifying daily observations and computes ozone
+rolling windows before calculating all four indices. `prepare_aqi` joins daily
+weather with one-to-one validation and computes the alternative index from the
+same hourly input. Categories and dominant pollutants always follow the primary
+standard. Concentrations, missing targets and weather are never changed to make
+scores look better. The manifest records both standard references, the prepared
+checksum, and counts of changed AQI values and categories.
 
 [2018 technical guidance](https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf)
-· [2024 technical guidance](https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf)
+· [2024 technical guidance](https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf)
 
 | Component | Concentration summary | Unit/precision before interpolation |
 | --- | --- | --- |

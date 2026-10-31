@@ -17,10 +17,11 @@ This is not PM2.5 concentration, Canada's AQHI, or an official published city AQ
 CO and PM10 are outside the original four-pollutant scope and are not silently claimed
 as included.
 
-The default uses fixed **EPA 2018 breakpoints**, retaining the PM2.5 scale used by
-the original project while correcting aggregation and calculation errors. The
-alternative EPA 2024 definition is stored in a separate column, avoiding an
-unexplained breakpoint change inside the time series.
+The default uses fixed **EPA 2024 breakpoints** across all archive years. The
+pandas pipeline rebuilds component indices, the combined AQI, categories and dominant
+pollutants from hourly observations. `AQI_epa_2018` preserves the earlier definition
+as a comparison column. This is a retrospective harmonization, not a claim that
+2024 breakpoints were used in historical government reports.
 
 - PM2.5: 24-hour mean; NO₂: daily maximum 1-hour value.
 - SO₂: maximum 1-hour value at lower levels, with the documented 24-hour high-level rule.
@@ -52,13 +53,13 @@ eligible origin/target pairs within each horizon.
 
 | Year | Horizon | Eligible forecasts | Ridge + weather | Forest + weather | Index-only forest | Persistence | Weekly naïve |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 2023 | 1 day | 247 | 13.311 | 13.619 | 14.737 | 16.478 | 20.231 |
-| 2023 | 7 days | 232 | 14.714 | 14.436 | 14.409 | 20.319 | 21.586 |
-| 2024 | 1 day | 308 | 8.089 | 7.786 | 9.041 | 11.026 | 12.981 |
-| 2024 | 7 days | 302 | 9.607 | 9.816 | 9.814 | 13.192 | 12.344 |
+| 2023 | 1 day | 247 | 13.984 | 14.456 | 15.217 | 17.283 | 20.980 |
+| 2023 | 7 days | 232 | 16.045 | 15.443 | 15.305 | 21.707 | 22.418 |
+| 2024 | 1 day | 308 | 9.533 | 9.119 | 10.739 | 12.656 | 15.494 |
+| 2024 | 7 days | 302 | 11.282 | 11.602 | 11.206 | 15.487 | 14.440 |
 
-The weather-assisted forest improves one-day MAE over persistence by **29.4% in
-2024**. Ridge improves one-day MAE by **19.2% in 2023**. These are improvements over
+The weather-assisted forest improves one-day MAE over persistence by **27.9% in
+2024**. Ridge improves one-day MAE by **19.1% in 2023**. These are improvements over
 the same-source persistence baseline, **not evidence of improvement over the old dataset**.
 No model is claimed to be universally best.
 
@@ -89,7 +90,7 @@ python -m unittest discover -s tests -v
 The committed daily AQI snapshot enables forecasting offline. To intentionally
 refresh provider versions, use `python data_sources.py --refresh` and regenerate
 the results. To reconstruct the alternative fixed breakpoint version, use
-`--aqi-standard epa_2024 --output data/processed/daily_aqi_2024.csv`; do not compare
+`--aqi-standard epa_2018 --output data/processed/daily_aqi_2018.csv`; do not compare
 its scores directly with another target definition as if only the data source changed.
 
 For the notebook:

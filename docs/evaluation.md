@@ -1,11 +1,11 @@
-# Restored AQI benchmark
+# AQI benchmark
 
-The PM2.5 concentration results above remain supplementary under `reports/2023/`
+The PM2.5 concentration results remain supplementary under `reports/2023/`
 and `reports/2024/`. The main benchmark now uses `daily_aqi.csv` and writes
 `reports/aqi/2023/` and `reports/aqi/2024/`. Its errors are **AQI points**, not µg/m³.
 
 The index retains the original four-pollutant scope, with an explicit fixed
-EPA-2018-based definition and a separate EPA-2024 sensitivity column. It is not a
+EPA-2024-based definition and a separate EPA-2018 comparison column. It is not a
 full official Toronto AQI or Canada's AQHI.
 
 ## Availability correction
@@ -33,9 +33,13 @@ Scores are conditional on this observed subset.
 
 ## Interpreting the results correctly
 
-In 2024, one-day forest+weather MAE is 7.786 AQI points against persistence 11.026,
-a 29.4% reduction. In 2023, one-day Ridge MAE is 13.311 against persistence 16.478,
-a 19.2% reduction. These describe performance against same-source baselines only.
+With EPA 2024 targets, one-day forest+weather MAE in 2024 is 9.119 AQI points
+against persistence 12.656, a 27.9% reduction. In 2023, one-day Ridge
+MAE is 13.984 against persistence 17.283, a 19.1% reduction.
+These describe performance against same-source baselines only. Earlier EPA 2018
+scores use a different target scale and are not a controlled model-improvement
+comparison. The standard migration does not establish that overfitting is resolved.
+
 
 The old data source's raw files are unavailable. The original saved scores used a
 different index construction, imputation and evaluation protocol. Neither the new

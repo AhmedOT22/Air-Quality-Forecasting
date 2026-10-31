@@ -13,7 +13,7 @@ its errors are not evidence of improved AQI predictions.
 | Station identity | Original processing discards station IDs and joins generated row IDs with dates | Toronto West NAPS 060430 retained, paired with ECCC 6158731 weather |
 | Temporal detail | Original loader reduces every pollutant to a daily mean | Hourly inputs support pollutant-specific daily maxima and ozone 8-hour windows |
 | Missing targets | Original notebook median-fills missing AQI | No target imputation; all four components required |
-| Index definition | US EPA-style breakpoints, but unvalidated averaging, rounding and upper-range handling | Explicit EPA-2018-based four-pollutant reconstruction; EPA-2024 alternative stored separately |
+| Index definition | US EPA-style breakpoints, but unvalidated averaging, rounding and upper-range handling | Explicit EPA-2024-based four-pollutant reconstruction across all years; EPA-2018 comparison stored separately |
 | Source-only accuracy improvement | Cannot measure without original observed inputs and an identical target/evaluation protocol | New AQI results can be compared with baselines, not claimed superior to old saved scores |
 
 **Verdict:** NAPS is a defensible, documented source for reconstructing this AQI.

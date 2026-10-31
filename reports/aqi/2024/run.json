@@ -1,10 +1,10 @@
 {
-  "input_sha256": "ccd5780bc8155b05a692f1dccf43933b99aa3c860e950f7881f37b86d0c364c0",
+  "input_sha256": "062bc813c063e1af5dd8874271af65f82240f4a1ac861bb1848c102e442caceb",
   "target": "AQI",
   "units": "AQI points",
   "calendar_days": 1827,
   "target_availability_delay_days": 1,
-  "aqi_standard": "epa_2018",
+  "aqi_standard": "epa_2024",
   "observed_target_days": 1709,
   "missing_target_days": 118,
   "start": "2020-01-01",
