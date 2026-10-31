@@ -1,10 +1,10 @@
 {
-  "attempted_at": "2026-10-31T17:24:08.914976+00:00",
+  "attempted_at": "2026-10-31T17:32:08.244442+00:00",
   "publication_status": "current",
   "contract_version": 1,
   "origin": "2026-10-30",
-  "pollution_age_hours": 0.4129585627777778,
-  "issued_rows": 14,
+  "pollution_age_hours": 0.550573305,
+  "issued_rows": 0,
   "prospective_scores": 0,
   "weather_status": "issued_experimental_challenger",
   "input_sha256": "05ace9b4186bc84202a06fd84296d0f1478638d0785463afe4d80dbad0428aed",
