@@ -19,7 +19,8 @@ ROOT=Path(__file__).resolve().parents[1]
 class DashboardDataTests(unittest.TestCase):
     def test_old_success_is_not_labelled_current(self):
         bundle=local_bundle()
-        label,_=freshness(bundle,now='2030-01-01T12:00:00Z')
+        future=(bundle['forecast'].origin.max()+pd.Timedelta(days=30)).tz_localize('UTC')
+        label,_=freshness(bundle,now=future)
         self.assertEqual(label,'Historical snapshot')
 
     def test_failed_refresh_keeps_historical_forecast_visible(self):
@@ -39,7 +40,7 @@ class DashboardDataTests(unittest.TestCase):
     def test_latest_model_version_is_displayed_without_merging_issuances(self):
         bundle=local_bundle();old=bundle['forecast'].copy()
         new=old.copy();new['model_id']='new-version'
-        new['issued_at']='2026-10-31T23:00:00+00:00'
+        new['issued_at']=(pd.to_datetime(old.issued_at,utc=True,format='ISO8601').max()+pd.Timedelta(hours=1)).isoformat()
         new['predicted_AQI']=new.predicted_AQI+1
         bundle['forecast']=pd.concat([old,new],ignore_index=True)
         result=validate_bundle(bundle)['forecast']
@@ -51,7 +52,7 @@ class DashboardDataTests(unittest.TestCase):
         for kind in ['duplicate','past']:
             changed=copy.deepcopy(bundle)
             if kind=='duplicate':changed['forecast']=pd.concat([changed['forecast'],changed['forecast'].iloc[[0]]])
-            else:changed['forecast'].loc[0,'Date']=changed['forecast'].loc[0,'origin']
+            else:changed['forecast'].iloc[0,changed['forecast'].columns.get_loc('Date')]=changed['forecast'].origin.iloc[0]
             with self.subTest(kind=kind),self.assertRaises(ValueError):validate_bundle(changed)
 
 
@@ -78,7 +79,10 @@ class DashboardUITests(unittest.TestCase):
         self.assertEqual(len(app.dataframe[0].value),3)
 
     def test_empty_live_scores_are_not_presented_as_zero_error(self):
-        app=self.app()
+        bundle=local_bundle();bundle['metrics']=pd.DataFrame()
+        bundle['status']['prospective_scores']=0
+        with patch('dashboard_data.load_bundle',return_value=bundle):
+            app=self.app()
         self.assertTrue(any('Waiting for observed outcomes' in info.value for info in app.info))
         self.assertTrue(any('79–87%' in info.value for info in app.info))
         app.selectbox[0].select('All data since 2020').run()
