@@ -1,0 +1,1 @@
+forecast_id,Date,horizon,model,issued_at,observed_at,actual_first,actual_latest,verification_status,model_abs_error,persistence_abs_error,weekly_abs_error,model_id,predicted_AQI,lower_AQI,upper_AQI,interval_covered

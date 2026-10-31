@@ -70,7 +70,27 @@ The selected configuration is separately refit through the completed origin
 **October 30, 2026**, producing forecasts for **October 31–November 6, 2026**.
 Read [forecast.csv](reports/workflow/forecast.csv), the executed notebook and
 [run metadata](reports/workflow/run.json). This is a dated forecast snapshot;
-scheduled refresh/publication is not configured. No calibrated intervals are claimed.
+scheduled refresh and prospective monitoring are now available as described below.
+
+## Automatic updates and new functionality
+
+[Scheduled refresh](.github/workflows/refresh.yml) runs twice daily at 11:17 and
+17:17 UTC. It validates fresh staged inputs, issues immutable forecasts and records
+subsequent observed AQI. Stale/missing inputs block publication. The frozen notebook
+snapshot and selected Ridge are preserved.
+
+- Prospective MAE/RMSE, rolling errors, horizon skill, baseline comparison and
+  deterioration diagnostics accumulate in [operational reports](reports/operational/).
+- Primary forecasts include experimental nominal 90% residual intervals. Measured
+  retrospective coverage was **79–87%**, so 90% coverage is not claimed as achieved.
+- A separate forecast-weather Ridge challenger uses archived/live Open-Meteo weather
+  predictions. It is published and monitored alongside the retained model.
+- Same-day forecasts are excluded from strictly prospective metrics. There are
+  initially **zero mature prospective scores**; future observations must arrive.
+
+Run `python operations.py` to refresh and issue locally. Full protocol, failure
+behavior, schedule times, attribution and limitations: [operations](docs/operations.md).
+The existing Streamlit interface will be updated later.
 
 ## Run
 

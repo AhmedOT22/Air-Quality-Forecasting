@@ -24,4 +24,5 @@ mismatched report lock. Historical NAPS bytes must match their frozen source rec
 changed archive versions require a separate review rather than silent substitution.
 Changes to transformation rules require a reviewed contract-version change and new
 snapshot. Routine observation updates require an explicit new snapshot lock and
-report regeneration. No scheduled live refresh is configured yet.
+report regeneration. Scheduled production refreshes stage new candidates under the same contract and
+validate them without overwriting this frozen release lock; see operations.md.

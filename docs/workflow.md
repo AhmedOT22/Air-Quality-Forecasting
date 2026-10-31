@@ -37,8 +37,8 @@ to be permanently untouched after publication. Prospective monitoring is still n
 Finally refit the frozen selection on all information available at the latest
 completed origin. Forecast the next seven dates, not historical fitting rows. Stop
 if required latest AQI lags are missing. The dated output carries its origin and
-input checksum. Current data can be downloaded, but no automatic scheduler or health
-warning system is implied. Future measured weather is never treated as known.
+input checksum. Current data can be downloaded, and an automatic scheduler now publishes separate operational reports. A health
+warning system is not implied. Future measured weather is never treated as known.
 
 Outputs are in `reports/workflow/`; run `python workflow.py` to regenerate them.
 The notebook normally displays the already executed outputs, verifying their lock.
