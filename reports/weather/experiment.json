@@ -1,0 +1,29 @@
+{
+  "dataset_lock": {
+    "contract_version": 1,
+    "input": "daily_aqi_latest.csv",
+    "input_sha256": "05ace9b4186bc84202a06fd84296d0f1478638d0785463afe4d80dbad0428aed",
+    "manifest_sha256": "004e8831bd3c45660bae697ef9982d1a890a0335a6b75fca45492ced6b30f7ca",
+    "hourly_sha256": "e5e5c5b1be938ea5db4e8ae0b84228d5fa674b5261cffa7daa59ae3d6337798a",
+    "standard": "epa_2024",
+    "start": "2020-01-01",
+    "end": "2026-10-30"
+  },
+  "config": {
+    "name": "ridge_forecast_weather_1",
+    "family": "ridge",
+    "alpha": 1.0
+  },
+  "fit_end": "2025-12-31",
+  "evaluation": "2026-01-01/2026-09-30",
+  "retained_model": "ridge_1",
+  "promotion": "No automatic promotion; issue as experimental challenger",
+  "availability_assumption": "Archived fixed h-day offsets are proxies for forecasts from origin day; exact vendor publication timestamps unavailable",
+  "limitations": [
+    "Archive stitched fixed-lead fields are not exact stored issuance-time snapshots",
+    "Retrospective comparison is exploratory, not proof of operational improvement",
+    "Challenger has less training history (forecast fields available from 2024)",
+    "Live retrieved forecast payload and retrieval time are archived before issuance"
+  ],
+  "attribution": "Weather data by Open-Meteo.com (CC BY 4.0); model output, not station measurements"
+}
