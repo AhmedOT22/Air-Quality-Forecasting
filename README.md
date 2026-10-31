@@ -100,6 +100,14 @@ python -m pip install -r requirements-notebook.txt
 jupyter lab AirQuality.ipynb
 ```
 
+The notebook presents configuration, optional ETL rebuild, data-quality gates,
+time boundaries, development-only exploration, an availability-aware feature
+example, chronological benchmarks, report checks, and monthly/category error
+analysis. Findings are generated from computed metrics. `REBUILD_DATA = False`
+uses the frozen snapshot by default; enabling it runs the existing preparation
+functions. Evaluation years are already inspected retrospective benchmarks, not
+untouched final tests.
+
 The notebook uses the same functions. Its cells are verified sequentially with
 captured actual outputs through `python scripts/execute_notebook.py`. The execution
 environment blocks Jupyter kernel sockets, so kernel startup itself is not verified.
