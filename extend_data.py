@@ -154,8 +154,10 @@ def extend(end=None, raw_dir='data/raw', output_dir='data/processed', refresh=Fa
         if not (weather.index.year == year).all():
             raise ValueError('Weather observations outside requested year')
         weather_frames.append(weather)
-        if year >= 2025:
-            sources.append(record)
+        # Record the bytes actually used on a cold hosted runner too; weather
+        # archives can be revised even for years in the frozen pollution period.
+        sources = [source for source in sources if source['url'] != record['url']]
+        sources.append(record)
     daily = daily.join(pd.concat(weather_frames), validate='one_to_one')
     daily['naps_station_id'] = '060430'
     daily['ontario_station_id'] = '35125'
