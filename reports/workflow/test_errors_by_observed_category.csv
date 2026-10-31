@@ -1,0 +1,13 @@
+model,observed_category,mean,count
+persistence,Good,12.342105263157896,228
+persistence,Moderate,18.25925925925926,81
+persistence,Unhealthy,103.0,2
+persistence,Unhealthy for Sensitive Groups,55.0,3
+ridge_1,Good,8.57110373013013,228
+ridge_1,Moderate,13.625043704761596,81
+ridge_1,Unhealthy,102.71066762425417,2
+ridge_1,Unhealthy for Sensitive Groups,46.58481145287487,3
+weekly,Good,13.951754385964913,228
+weekly,Moderate,21.530864197530864,81
+weekly,Unhealthy,103.0,2
+weekly,Unhealthy for Sensitive Groups,71.33333333333333,3

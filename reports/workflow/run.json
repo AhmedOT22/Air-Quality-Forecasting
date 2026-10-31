@@ -1,0 +1,49 @@
+{
+  "dataset_lock": {
+    "contract_version": 1,
+    "input": "daily_aqi_latest.csv",
+    "input_sha256": "05ace9b4186bc84202a06fd84296d0f1478638d0785463afe4d80dbad0428aed",
+    "manifest_sha256": "004e8831bd3c45660bae697ef9982d1a890a0335a6b75fca45492ced6b30f7ca",
+    "hourly_sha256": "e5e5c5b1be938ea5db4e8ae0b84228d5fa674b5261cffa7daa59ae3d6337798a",
+    "standard": "epa_2024",
+    "start": "2020-01-01",
+    "end": "2026-10-30"
+  },
+  "candidate_folds": [
+    2022,
+    2023
+  ],
+  "tuning_period": 2024,
+  "final_evaluation_period": 2025,
+  "selected_config": {
+    "name": "ridge_1",
+    "family": "ridge",
+    "alpha": 1.0
+  },
+  "candidate_winner": {
+    "name": "ridge_10",
+    "family": "ridge",
+    "alpha": 10.0
+  },
+  "selection_rule": "Lowest mean MAE with equal weight per fold and horizon; selection excludes 2025",
+  "horizons": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "forest_trees": 100,
+  "seed": 42,
+  "latest_completed_origin": "2026-10-30",
+  "forecast_status": "Forecast after the latest completed observation day; freshness depends on input refresh",
+  "caveats": [
+    "2022-2024 previously inspected; retrospective development, not pristine tests",
+    "2025 is held out from this selection procedure, not a permanent untouched test after publication",
+    "2025 includes provisional Ontario observations and a source precision change",
+    "No calibrated uncertainty intervals or health-warning capability claimed",
+    "Daily AQI availability delayed one full day; no future measured weather used"
+  ]
+}
