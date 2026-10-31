@@ -1,0 +1,59 @@
+{
+  "input_sha256": "a09c73b621c2a90ea9b42956e8b56bdb7e4e20216e4d783f7192d2b4fb8e4518",
+  "target": "PM25",
+  "units": "µg/m³",
+  "calendar_days": 1827,
+  "observed_target_days": 1801,
+  "missing_target_days": 26,
+  "start": "2020-01-01",
+  "end": "2024-12-31",
+  "train_end": "2023-12-31",
+  "holdout_start": "2024-01-01",
+  "test_days": 366,
+  "horizon": 7,
+  "trees": 200,
+  "seed": 42,
+  "ridge_alpha": 10,
+  "training_samples_by_horizon": {
+    "1": 1302,
+    "2": 1294,
+    "3": 1292,
+    "4": 1291,
+    "5": 1289,
+    "6": 1288,
+    "7": 1286
+  },
+  "eligible_pairs_by_horizon": {
+    "1": 355,
+    "2": 353,
+    "3": 352,
+    "4": 351,
+    "5": 350,
+    "6": 349,
+    "7": 348
+  },
+  "evaluation": "Fixed pre-holdout fit; separate direct models per horizon; observed targets only",
+  "availability_assumption": "Completed origin-day finalized archive observations available; publication latency/revisions not simulated",
+  "weather_imputation": "Training-only median + missing indicators; no target imputation",
+  "forecast_status": "Archive-end projection; not a current forecast",
+  "python": "3.12.14",
+  "packages": {
+    "pandas": "2.2.3",
+    "numpy": "2.3.5",
+    "scikit-learn": "1.8.0",
+    "matplotlib": "3.10.8"
+  },
+  "pollution_lags_calendar_days": [
+    0,
+    1,
+    2,
+    6,
+    13
+  ],
+  "weather_fields": [
+    "temperature_c",
+    "humidity_pct",
+    "wind_speed_kmh",
+    "pressure_kpa"
+  ]
+}

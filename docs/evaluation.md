@@ -1,34 +1,92 @@
-# Evaluation design
+# Evaluation and interpretation
 
-## Interpreting the original analysis
+## Task
 
-The notebook constructs its target from pollutant concentrations and also includes same-day PM2.5, NO₂, and ozone in the predictors. These explain index relationships, but would not be available before the predicted day. TimeSeriesSplit alone does not fix feature availability.
+Predict daily mean PM2.5 concentration (µg/m³) at Toronto West at lead times 1–7 days.
+An origin is the **completed local-standard day**. The retrospective benchmark assumes
+that day's finalized pollution and weather observations are available. It does not
+simulate publication delays or vintage revisions and is not a live warning system.
 
-Other limitations in the saved exploration:
+## Chronological exercises
 
-- An 80/20 random split mixes past and future observations for supervised tuning.
-- Missing values, including targets, are filled with whole-series statistics before evaluation.
-- Section 6.3 fits supervised models on all `X,y` and evaluates on some of the same rows. These are in-sample reconstruction scores. Statistical models use a different training setup, so the table is not a fair model ranking.
-- The recursive example holds environmental predictors constant, advances the month every day, and starts with an incorrect next-day lag state. The final plotting cell refers to undefined outer variables.
-- The exported and subsequently overwritten `rf_model` is distinct from the tuned `best_rf_model` used in evaluation.
+| Evaluation period | Fitting targets end | Input start | Holdout length |
+| --- | --- | --- | --- |
+| 2023 | 2022-12-31 | 2020-01-01 | 365 days |
+| 2024 | 2023-12-31 | 2020-01-01 | 366 days |
 
-The notebook remains an original exploration with limitations documented in this file and the README. Its outputs have not been silently relabelled as corrected results.
+Each horizon has separate direct estimators. A training origin is used only when
+its target date is at or before the fitting boundary. Later evaluation observations
+can update the available feature history, but models and imputers remain fixed
+throughout that year's evaluation.
 
-## Standalone benchmark
+The 2024 exercise includes 2023 observations in its training window. The two
+exercises are not independent tests, and neither is a permanently untouched lockbox
+for future model development. Model settings below were fixed before this comparison;
+no holdout tuning or claimed optimal parameters are involved.
 
-1. Validate and sort consecutive daily observations; do not impute evaluation targets.
-2. Reserve the final `test_days` observations chronologically.
-3. Fit a fixed Random Forest on training rows. Features are AQI lags 1, 2, 3, 7, 14 and sine/cosine day-of-year terms known in advance. No hyperparameter selection uses holdout data.
-4. At each eligible origin, forecast recursively, using predictions rather than unrevealed actuals in later lags.
-5. Compare persistence (last known observation) and seasonal naïve (repeat the latest observed week) on identical origins/targets for each horizon.
-6. Save metrics, prediction rows, and run metadata. Refit on all observations only afterwards for a separate future forecast.
+## Features and models
 
-Defaults are 200 trees, minimum leaf size 3, seed 42: fixed starting choices, not optimal tuned parameters. Actual targets are assumed available at each origin; reporting delays would require another availability constraint.
+All pollution features refer to the origin or earlier: lags 0, 1, 2, 6 and 13 calendar
+days, plus the seven-day trailing mean requiring all seven observations. Calendar
+sine/cosine terms describe the known target day of year. Weather features are daily
+means at the completed origin: temperature, relative humidity, wind speed and pressure.
+No observed target-day or intermediate future weather is used.
 
-Only complete trajectories are evaluated. Therefore, the final `horizon - 1` days do not have one-day predictions from later origins. Overlapping trajectories are dependent: counts are forecast counts, not independent trials. The plot shows one-day predictions only. No confidence intervals, causal effects, or calibrated public-health categories are claimed.
+- **Ridge + weather:** median imputation, missing indicators, standardization, alpha 10.
+- **Forest, pollution only:** 200 trees, minimum leaf size 5, seed 42.
+- **Forest + weather:** identical forest settings with weather added.
+- **Persistence:** repeat the origin's observed concentration for every horizon.
+- **Weekly seasonal naïve:** use the observed concentration on target date minus seven days.
 
-## Validation status
+Weather imputation statistics and scaling are fit on training rows only. Pollution
+features must already be observed; no target or pollution lag is imputed. Predictions
+are bounded below at zero. No upper bound clips real pollution episodes.
 
-Tests use deterministic artificial daily series and the package versions in `requirements-tested.txt`. Changing all held-out labels must leave the first complete forecast trajectory unchanged. These fixtures validate behavior, not forecast accuracy.
+Direct models avoid recursively assuming future measured weather is known. This
+supersedes the earlier standalone recursive lag-only AQI workflow.
 
-No corrected Toronto MAE/RMSE is available until source observations, station metadata, and the target definition are verified. If the model loses to persistence, report that result.
+## Fair pairs, gaps, and metrics
+
+All models are evaluated on exactly the same eligible origin/target pairs **within
+each horizon**. Origins start on the last fitting day. Targets must be observed,
+and the pollution history needed by the features/baselines must exist. The calendar
+is never compressed after dropping missing values.
+
+| Year | 1-day eligible pairs | 7-day eligible pairs |
+| --- | ---: | ---: |
+| 2023 | 335 | 326 |
+| 2024 | 355 | 348 |
+
+Pair counts vary by horizon because later targets can lie beyond the holdout or
+be missing. Metrics are conditional on these observed pairs, not on every date.
+Gaps may be non-random; report this limitation rather than assuming exclusion is harmless.
+Overlapping origins are dependent, so counts are not independent sample sizes.
+
+Reports include MAE, RMSE and `1 - model_MAE / persistence_MAE`; positive skill means
+lower MAE than persistence. Monthly one-day errors help reveal temporal variation.
+No confidence intervals, statistical significance or causal attribution are claimed.
+
+## Findings
+
+Ridge improves one-day MAE over persistence by 14.3% in 2023 and 15.6% in 2024.
+The weather-assisted forest improves on its pollution-only counterpart at one day
+in both years, but not at seven days by MAE. At seven days, pollution-only forest
+MAE is 4.825 in 2023 and 3.185 in 2024, compared with persistence 7.008 and 4.353.
+Other metrics and horizons can favour another model; inspect the full tables.
+
+2023 errors are larger. Source method changes, sparse extreme events, omitted
+spatial/smoke predictors, and the airport weather proxy limit generalization.
+This benchmark does not identify which factor explains any individual error.
+
+After holdout scoring, estimators are separately refit using all observations up
+to the archive endpoint to produce `forecast.csv`. Those projections do not alter
+holdout metrics and are not current forecasts. If the endpoint lacks eligible
+pollution history, an empty forecast and explicit status are written.
+
+## Archived exploration
+
+`notebooks/legacy/AirQuality.ipynb` and `calculation.py` preserve the original work,
+not the current modelling path. Its derived AQI construction, full-series imputation,
+random splits, same-day pollutant predictors, in-sample comparisons and old saved
+accuracy claims remain unsuitable as unbiased future-forecast evidence. Its results
+are not comparable with the new PM2.5 target and are not reused in the main notebook.
