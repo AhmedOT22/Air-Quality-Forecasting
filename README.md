@@ -34,6 +34,25 @@ The prepared snapshot has **1,827 calendar days**, **1,709 complete AQI targets*
 and **118 missing targets**. Source metadata, methods, download times and checksums
 are committed. The raw national files are cached locally and excluded from Git.
 
+## Extended observations for forward forecasting
+
+The latest concatenated dataset covers **January 1, 2020 through October 31, 2026**
+(hourly observations), with **2,495 completed daily rows through October 30** and
+**2,358 complete AQI targets**. NAPS is preferred for 2020–2024; Ontario observations
+extend the series from 2025 onward. Conflicting duplicate dates are quarantined,
+missing targets remain missing, and Ontario-containing values are flagged as not
+finally verified. Pearson weather is extended from the same ECCC source.
+
+```bash
+python extend_data.py
+# Extended input for subsequent forecasting:
+python forecast.py --input data/processed/daily_aqi_latest.csv --output reports/latest
+```
+
+Read [concatenation rules, coverage and source checks](docs/extended_data.md).
+The existing benchmark results below use the frozen historical snapshot; they
+have not been silently recalculated on this extended dataset.
+
 ## Does the new source improve the original project?
 
 NAPS provides documented quality-assured measurements and reproducible provenance.
