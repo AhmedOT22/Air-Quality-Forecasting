@@ -9,8 +9,8 @@ python -m streamlit run app.py
 ```
 
 `requirements-app.txt` pins the tested UI dependencies alongside the existing tested
-modelling environment. `requirements.txt` also includes Streamlit/Plotly so a normal
-Streamlit Community Cloud deployment can install them. Select this repository,
+modelling environment. `requirements.txt` delegates to those same pins so a normal
+Streamlit Community Cloud deployment uses the CI versions. Select this repository,
 branch `main`, entry point `app.py`. No API keys or secrets are required. Creating the
 app source and passing tests does not itself create a hosted Community Cloud URL.
 
@@ -41,6 +41,9 @@ A report marked successful at generation is not shown as current indefinitely.
 Blocked refreshes retain historical predictions with a warning rather than hide
 failure behind a green status. Multiple releases on one origin are separated by
 model version; the newest version is displayed without averaging their predictions.
+Invalid numeric values, incomplete horizon sets and date/horizon mismatches reject
+the bundle. Observations are normalized to dates before deduplication and reindexed
+to a complete daily calendar so missing periods are visible in both charts.
 
 The dashboard uses existing reports. It does not contact the pollutant/weather APIs
 or invent missing observations, live accuracy, forecast intervals or health advice.

@@ -23,8 +23,9 @@ and never imputes AQI. Ontario-containing values are explicitly flagged as not f
 verified. Source URLs, times, hashes, overlap diagnostics and quarantines are recorded.
 
 **ETL contract version 1 is locked.** Modelling verifies the daily, manifest and hourly
-checksums before running. A refresh requires review, explicit lock renewal and report
-regeneration. See [ETL contract](docs/etl_contract.md), [extended data](docs/extended_data.md),
+checksums before running. Replacing the frozen research snapshot requires review,
+explicit lock renewal and report regeneration; scheduled production refreshes use
+separate staging under the same contract. See [ETL contract](docs/etl_contract.md), [extended data](docs/extended_data.md),
 [formulas](docs/data.md) and [source assessment](docs/source_comparison.md).
 
 ## Main analytical flow
@@ -85,8 +86,8 @@ snapshot and selected Ridge are preserved.
   retrospective coverage was **79–87%**, so 90% coverage is not claimed as achieved.
 - A separate forecast-weather Ridge challenger uses archived/live Open-Meteo weather
   predictions. It is published and monitored alongside the retained model.
-- Same-day forecasts are excluded from strictly prospective metrics. There are
-  initially **zero mature prospective scores**; future observations must arrive.
+- Same-day forecasts are excluded from strictly prospective metrics. The ledger
+  started with zero mature scores; consult the dashboard for accumulated outcomes.
 
 Run `python operations.py` to refresh and issue locally. Full protocol, failure
 behavior, schedule times, attribution and limitations: [operations](docs/operations.md).
@@ -96,7 +97,7 @@ then `python -m streamlit run app.py`. See [dashboard setup and behavior](docs/d
 
 ## Run
 
-Python 3.11+, from the repository root:
+Python 3.11 is the CI reference environment. From the repository root:
 
 ```bash
 python -m venv .venv
@@ -112,6 +113,11 @@ python -m unittest discover -s tests -v
 python -m pip install -r requirements-notebook.txt
 python scripts/execute_notebook.py
 # Or: jupyter lab AirQuality.ipynb
+
+# Development checks, including the actual Streamlit interface:
+python -m pip install -r requirements-dev.txt
+python -m ruff check .
+python -m unittest discover -s tests -v
 ```
 
 The notebook defaults to displaying executed reports with a matching lock. Set
@@ -142,6 +148,9 @@ future retrieval of identical raw bytes; pinned historical hashes fail closed.
 | `etl_contract.py` | Data validation and explicit snapshot lock |
 | `extend_data.py`, `aqi_data.py`, `data_sources.py`, `aqi.py` | Shared ETL and AQI formulas |
 | `workflow.py` | Expanding folds, bounded tuning, evaluation and forward refit |
+| `operations.py` | Scheduled issuance, immutable history and prospective monitoring |
+| `forecast_weather.py`, `weather_model.py` | Archived/live forecast-weather challenger |
+| `uncertainty.py` | Chronological residual calibration and coverage evaluation |
 | `reports/workflow/` | Current selection, diagnostics, evaluation and future forecasts |
 | `data/processed/*latest*` | Extended hourly/daily inputs, manifest and lock |
 | `forecast.py`, `reports/aqi/2023/`, `reports/aqi/2024/` | Earlier fixed-setting historical benchmarks |
@@ -155,8 +164,13 @@ limit generalization. Ontario warns that unverified observations should not be u
 in published documents; experimental extension results are distinguished from the
 quality-assured archive. Additional publication delays and archive revisions are not
 simulated. Sparse high-pollution events and overlapping forecasts limit conclusions.
-Prospective monitoring, forecast-weather features and uncertainty calibration remain
-future work, not completed capabilities.
+Prospective monitoring, forecast-weather features and interval calibration are
+implemented. Their evidence remains limited: live outcomes must accumulate, the
+challenger is exploratory, and interval coverage is below its nominal level.
+
+The [final audit](docs/audit.md) records validation and remaining release work.
+Public Streamlit hosting and desktop/mobile browser review remain outstanding;
+the repository and passing tests alone do not provide a deployed app.
 
 Source observations: Environment and Climate Change Canada, NAPS, Meteorological
 Service of Canada and Government of Ontario, accessed October 31, 2026. NAPS data

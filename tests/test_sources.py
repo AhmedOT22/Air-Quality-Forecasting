@@ -1,7 +1,6 @@
 """Source-format fixtures test quality rules without network access."""
 import csv
 import io
-import json
 import tempfile
 import unittest
 from pathlib import Path

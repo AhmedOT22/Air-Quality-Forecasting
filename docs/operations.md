@@ -38,6 +38,8 @@ cleaning rules or a replacement of the reproducible historical analysis.
 identity, implementation revision, prediction, optional bounds, input checksum and
 both baseline predictions. Model identity includes hyperparameters and relevant
 forecast implementation bytes. New versions remain distinguishable in metrics.
+Issuance time is read after inference. Scoring accepts ISO timestamps with or
+without fractional seconds; monitoring alerts include the model version.
 
 Only target dates that start after the issuance's fixed-EST date count as
 **prospective**. Same-day h1 forecasts are retained and explicitly excluded from
@@ -114,6 +116,7 @@ No provider concentration/AQHI forecasts are substituted for this project's AQI 
   payloads/sidecars and interval calibration. Artifacts expire after 90 days; the
   committed ledgers persist. This is not a claim of indefinite raw snapshot retention.
 
-A new Streamlit interface is available in `app.py`; see dashboard.md. It reads
-these reports and never triggers training or data refresh from the UI. Prospective performance requires future observations
-to arrive, so successful deployment does not itself demonstrate forecast skill.
+A Streamlit interface is available in `app.py`; see [dashboard setup](dashboard.md).
+It reads these reports and never triggers training or data refresh from the UI.
+Prospective performance requires future observations to arrive, so successful
+deployment does not itself demonstrate forecast skill.

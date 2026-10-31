@@ -29,16 +29,18 @@ Evaluate the selection and baselines on identical eligible pairs per horizon.
 Report training MAE, evaluation MAE/RMSE, persistence skill, monthly error and error
 by observed category with counts. Training errors are optimistic diagnostics, not
 validation scores; differing conditions and source precision also affect the gap.
-Overlapping forecasts are dependent. No significance or uncertainty coverage is
-claimed. All periods have their source-quality limitations, and 2022–2024 were
+Overlapping forecasts are dependent. No statistical significance is claimed for
+these comparisons. Interval coverage is assessed separately on 2026 data in
+[the operational protocol](operations.md). All periods have source-quality limitations, and 2022–2024 were
 already inspected. 2025 is excluded from this model-selection procedure, not claimed
-to be permanently untouched after publication. Prospective monitoring is still needed.
+to be permanently untouched after publication. Prospective monitoring is implemented;
+its evidence must accumulate after issuance.
 
 Finally refit the frozen selection on all information available at the latest
 completed origin. Forecast the next seven dates, not historical fitting rows. Stop
 if required latest AQI lags are missing. The dated output carries its origin and
-input checksum. Current data can be downloaded, and an automatic scheduler now publishes separate operational reports. A health
-warning system is not implied. Future measured weather is never treated as known.
+input checksum. The automatic scheduler publishes separate operational reports.
+A health warning system is not implied. Future measured weather is never treated as known.
 
 Outputs are in `reports/workflow/`; run `python workflow.py` to regenerate them.
 The notebook normally displays the already executed outputs, verifying their lock.
