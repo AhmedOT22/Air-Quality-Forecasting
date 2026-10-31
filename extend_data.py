@@ -112,13 +112,16 @@ def extend(end=None, raw_dir='data/raw', output_dir='data/processed', refresh=Fa
         raise ValueError('Expected Toronto West historical station')
     boundary = pd.Timestamp('2024-12-31 23:00')
     sources = list(frozen['sources'])
+    pinned = {record['url']: record['sha256'] for record in sources}
     naps_columns, ontario_columns, quality, overlaps = [], [], [], []
     for pollutant in POLLUTANTS:
         annual = []
         for year in range(2020, 2025):
             path = raw / f'{pollutant}_{year}.csv'
             relative = f'Data-Donnees/{year}/ContinuousData-DonneesContinu/HourlyData-DonneesHoraires/{pollutant}_{year}.csv'
-            content, _ = download(naps_url(relative), path)
+            content, record = download(naps_url(relative), path)
+            if record['sha256'] != pinned.get(record['url']):
+                raise ValueError('NAPS archive differs from the frozen source record; review before rebuilding')
             annual.append(read_hourly(content, pollutant)[0])
         history = pd.concat(annual)
         url = ontario_url(pollutant, end)
