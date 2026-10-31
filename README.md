@@ -90,7 +90,9 @@ snapshot and selected Ridge are preserved.
 
 Run `python operations.py` to refresh and issue locally. Full protocol, failure
 behavior, schedule times, attribution and limitations: [operations](docs/operations.md).
-The existing Streamlit interface will be updated later.
+The new [Streamlit dashboard](app.py) presents forecasts, uncertainty, observations
+and prospective performance. Run `python -m pip install -r requirements-app.txt`,
+then `python -m streamlit run app.py`. See [dashboard setup and behavior](docs/dashboard.md).
 
 ## Run
 
@@ -136,6 +138,7 @@ future retrieval of identical raw bytes; pinned historical hashes fail closed.
 | Path | Purpose |
 | --- | --- |
 | `AirQuality.ipynb` | Main ten-stage analysis and forward forecasts |
+| `app.py`, `dashboard_data.py` | Streamlit interface and read-only report loading |
 | `etl_contract.py` | Data validation and explicit snapshot lock |
 | `extend_data.py`, `aqi_data.py`, `data_sources.py`, `aqi.py` | Shared ETL and AQI formulas |
 | `workflow.py` | Expanding folds, bounded tuning, evaluation and forward refit |

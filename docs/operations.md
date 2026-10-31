@@ -114,6 +114,6 @@ No provider concentration/AQHI forecasts are substituted for this project's AQI 
   payloads/sidecars and interval calibration. Artifacts expire after 90 days; the
   committed ledgers persist. This is not a claim of indefinite raw snapshot retention.
 
-The existing Streamlit interface is reserved for its later update; no replacement
-interface is introduced here. Prospective performance requires future observations
+A new Streamlit interface is available in `app.py`; see dashboard.md. It reads
+these reports and never triggers training or data refresh from the UI. Prospective performance requires future observations
 to arrive, so successful deployment does not itself demonstrate forecast skill.
