@@ -1,4 +1,4 @@
-"""Direct 1–7 day PM2.5 forecasts with chronological, station-specific backtests."""
+"""Direct 1–7 day AQI forecasts; optional PM2.5 concentration analysis."""
 
 import argparse
 import hashlib
@@ -22,6 +22,20 @@ MODEL_NAMES = ('ridge_weather', 'forest_lags', 'forest_weather')
 BASELINES = ('persistence', 'seasonal_naive')
 
 
+def target_spec(frame):
+    if 'AQI' in frame:
+        return 'AQI', 'AQI points', 1
+    if 'PM25' in frame:
+        return 'PM25', 'µg/m³', 0
+    raise ValueError('Expected AQI, or PM25 for the separate concentration analysis')
+
+
+def seasonal_lag(step, delay):
+    # Repeat the most recently AVAILABLE week. With delayed AQI, target-7
+    # can still be unavailable at horizon 7, so repeat the earlier week.
+    return delay + 6 - ((step + delay - 1) % 7)
+
+
 def validate_frame(frame):
     if not isinstance(frame.index, pd.DatetimeIndex) or frame.index.tz is not None:
         raise ValueError('Expected timezone-free daily calendar dates')
@@ -30,12 +44,13 @@ def validate_frame(frame):
             or not frame.index.equals(frame.index.normalize())):
         raise ValueError('Dates must be nonempty, sorted, and unique')
     if not frame.index.equals(pd.date_range(frame.index[0], frame.index[-1], freq='D', name=frame.index.name)):
-        raise ValueError('Retain every calendar day, including days with missing PM25')
-    if 'PM25' not in frame:
-        raise ValueError('Expected PM25 concentration column, not the legacy derived AQI')
-    values = pd.to_numeric(frame.PM25, errors='raise')
+        raise ValueError('Retain every calendar day, including missing target days')
+    target, _, _ = target_spec(frame)
+    if target == 'AQI' and 'aqi_standard' in frame and frame.aqi_standard.nunique(dropna=False) != 1:
+        raise ValueError('AQI breakpoint definitions must be consistent throughout the series')
+    values = pd.to_numeric(frame[target], errors='raise')
     if np.isinf(values).any() or (values.dropna() < 0).any() or values.notna().sum() < 60:
-        raise ValueError('Need at least 60 finite, non-negative observed PM25 days; gaps may be NaN')
+        raise ValueError('Need at least 60 finite, non-negative observed target days; gaps may be NaN')
     for name in WEATHER_FIELDS:
         if name not in frame or np.isinf(pd.to_numeric(frame[name], errors='raise')).any():
             raise ValueError(f'Missing or infinite weather feature: {name}')
@@ -64,10 +79,12 @@ def make_features(frame, horizon):
     """Rows describe information available after the completed origin day only."""
     if not 1 <= horizon <= 7:
         raise ValueError('Supported horizons are 1 through 7 days')
+    target, _, delay = target_spec(frame)
+    available = frame[target].shift(delay)
     features = pd.DataFrame(index=frame.index)
     for lag in LAGS:
-        features[f'pm25_lag_{lag}'] = frame.PM25.shift(lag)
-    features['pm25_mean_7d'] = frame.PM25.rolling(7, min_periods=7).mean()
+        features[f'{target.lower()}_lag_{lag}'] = available.shift(lag)
+    features[f'{target.lower()}_mean_7d'] = available.rolling(7, min_periods=7).mean()
     target_dates = frame.index + pd.Timedelta(days=horizon)
     angle = 2 * np.pi * target_dates.dayofyear / 365.25
     features['target_day_sin'] = np.sin(angle)
@@ -95,8 +112,9 @@ def fit_horizon(frame, train_end, horizon, trees=200):
     if trees < 1:
         raise ValueError('trees must be positive')
     features, lag_columns, eligible = make_features(frame, horizon)
-    target = frame.PM25.shift(-horizon)
-    label_dates = frame.index + pd.Timedelta(days=horizon)
+    target_name, _, delay = target_spec(frame)
+    target = frame[target_name].shift(-horizon)
+    label_dates = frame.index + pd.Timedelta(days=horizon + delay)
     training = eligible & target.notna() & (label_dates <= pd.Timestamp(train_end))
     if training.sum() < 30:
         raise ValueError(f'Fewer than 30 eligible training samples at horizon {horizon}')
@@ -130,11 +148,13 @@ def backtest(frame, test_days=366, horizon=7, trees=200):
         raise ValueError('Require horizon 1–7 and a holdout leaving at least 60 training days')
     split = len(frame) - test_days
     train_end = frame.index[split - 1]
+    target_name, _, delay = target_spec(frame)
+    available = frame[target_name].shift(delay)
     records, training_counts = [], {}
     for step in range(1, horizon + 1):
         models, features, eligible, count = fit_horizon(frame, train_end, step, trees)
         training_counts[str(step)] = count
-        target = frame.PM25.shift(-step)
+        target = frame[target_name].shift(-step)
         # Origins start at the last training day. Subsequent completed holdout
         # observations become available, but never enter model fitting.
         evaluate = eligible & target.notna() & (frame.index >= train_end)
@@ -143,8 +163,8 @@ def backtest(frame, test_days=366, horizon=7, trees=200):
             raise ValueError(f'No eligible observed holdout pairs at horizon {step}')
         result = pd.DataFrame({'origin': origins, 'Date': origins + pd.Timedelta(days=step),
                                'horizon': step, 'actual': target.loc[evaluate].to_numpy(),
-                               'persistence': frame.loc[evaluate, 'PM25'].to_numpy(),
-                               'seasonal_naive': frame.PM25.shift(7 - step).loc[evaluate].to_numpy()})
+                               'persistence': available.loc[evaluate].to_numpy(),
+                               'seasonal_naive': frame[target_name].shift(seasonal_lag(step, delay)).loc[evaluate].to_numpy()})
         for name, (model, columns) in models.items():
             result[name] = np.maximum(0, model.predict(features.loc[evaluate, columns]))
         records.append(result)
@@ -155,6 +175,7 @@ def backtest(frame, test_days=366, horizon=7, trees=200):
 
 def future_forecast(frame, horizon=7, trees=200):
     """Refit after evaluation; forecast beyond the archive end, not live conditions."""
+    target_name, _, delay = target_spec(frame)
     output = []
     for step in range(1, horizon + 1):
         models, features, eligible, _ = fit_horizon(frame, frame.index[-1], step, trees)
@@ -163,13 +184,13 @@ def future_forecast(frame, horizon=7, trees=200):
         row = {'origin': frame.index[-1], 'Date': frame.index[-1] + pd.Timedelta(days=step), 'horizon': step}
         for name, (model, columns) in models.items():
             row[name] = max(0.0, float(model.predict(features.iloc[[-1]][columns])[0]))
-        row['persistence'] = float(frame.PM25.iloc[-1])
-        row['seasonal_naive'] = float(frame.PM25.iloc[-7 + step - 1])
+        row['persistence'] = float(frame[target_name].iloc[-1-delay])
+        row['seasonal_naive'] = float(frame[target_name].iloc[-1-seasonal_lag(step, delay)])
         output.append(row)
     return pd.DataFrame(output)
 
 
-def plot_results(predictions, metrics, output):
+def plot_results(predictions, metrics, output, target='PM25', units='µg/m³'):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
@@ -179,7 +200,7 @@ def plot_results(predictions, metrics, output):
     fig, ax = plt.subplots(figsize=(12, 4))
     for name, color in [('actual', '#122c36'), ('forest_weather', '#167466'), ('persistence', '#c27d32')]:
         ax.plot(one.index, one[name], label=name.replace('_', ' '), color=color, linewidth=1.1)
-    ax.set(xlabel='Target date (local standard calendar)', ylabel='PM2.5 (µg/m³)',
+    ax.set(xlabel='Target date (local standard calendar)', ylabel=f'{target} ({units})',
            title='One-day forecasts: observed eligible holdout pairs')
     ax.legend(ncol=3)
     fig.autofmt_xdate()
@@ -190,7 +211,7 @@ def plot_results(predictions, metrics, output):
     for model in MODEL_NAMES + BASELINES:
         data = metrics.loc[metrics.model == model]
         ax.plot(data.horizon, data.MAE, marker='o', label=model.replace('_', ' '))
-    ax.set(xlabel='Forecast horizon (days)', ylabel='MAE (µg/m³)', title='Error by horizon; identical pairs per model')
+    ax.set(xlabel='Forecast horizon (days)', ylabel=f'MAE ({units})', title='Error by horizon; identical pairs per model')
     ax.legend(fontsize=8)
     fig.tight_layout()
     fig.savefig(output / 'horizon_errors.png', dpi=160)
@@ -204,6 +225,7 @@ def run(input_path, output_dir, test_days=366, horizon=7, trees=200, end_date=No
         if end not in frame.index:
             raise ValueError('end_date must be present in the prepared calendar')
         frame = frame.loc[:end]
+    target_name, units, delay = target_spec(frame)
     predictions, metrics = backtest(frame, test_days, horizon, trees)
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
@@ -225,29 +247,33 @@ def run(input_path, output_dir, test_days=366, horizon=7, trees=200, end_date=No
                             'MAE': float((group[name] - group.actual).abs().mean())})
     pd.DataFrame(monthly).to_csv(output / 'monthly_metrics.csv', index=False)
     metadata = {'input_sha256': hashlib.sha256(Path(input_path).read_bytes()).hexdigest(),
-                'target': 'PM25', 'units': 'µg/m³', 'calendar_days': len(frame),
-                'observed_target_days': int(frame.PM25.notna().sum()),
-                'missing_target_days': int(frame.PM25.isna().sum()),
+                'target': target_name, 'units': units, 'calendar_days': len(frame),
+                'target_availability_delay_days': delay,
+                'aqi_standard': str(frame.aqi_standard.iloc[0]) if 'aqi_standard' in frame else None,
+                'observed_target_days': int(frame[target_name].notna().sum()),
+                'missing_target_days': int(frame[target_name].isna().sum()),
                 'start': str(frame.index[0].date()), 'end': str(frame.index[-1].date()),
                 'train_end': str(frame.index[-test_days-1].date()),
                 'holdout_start': str(frame.index[-test_days].date()), 'test_days': test_days,
                 'horizon': horizon, 'trees': trees, 'seed': 42, 'ridge_alpha': 10,
-                'pollution_lags_calendar_days': list(LAGS), 'weather_fields': list(WEATHER_FIELDS),
+                'pollution_lags_calendar_days': [lag + delay for lag in LAGS],
+                'lags_relative_to_latest_available_target': list(LAGS),
+                'weather_fields': list(WEATHER_FIELDS),
                 'training_samples_by_horizon': predictions.attrs['training_samples_by_horizon'],
                 'eligible_pairs_by_horizon': {str(h): len(g) for h, g in predictions.groupby('horizon')},
                 'evaluation': 'Fixed pre-holdout fit; separate direct models per horizon; observed targets only',
-                'availability_assumption': 'Completed origin-day finalized archive observations available; publication latency/revisions not simulated',
+                'availability_assumption': f'Target values delayed {delay} full day(s); origin-day weather available. Additional publication latency/revisions not simulated',
                 'weather_imputation': 'Training-only median + missing indicators; no target imputation',
                 'forecast_status': forecast_status, 'python': platform.python_version(),
                 'packages': {p: version(p) for p in ('pandas', 'numpy', 'scikit-learn', 'matplotlib')}}
     (output / 'run.json').write_text(json.dumps(metadata, indent=2, ensure_ascii=False) + '\n')
-    plot_results(predictions, metrics, output)
+    plot_results(predictions, metrics, output, target_name, units)
     return metrics
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--input', type=Path, default=Path('data/processed/daily_pm25.csv'))
+    parser.add_argument('--input', type=Path, default=Path('data/processed/daily_aqi.csv'))
     parser.add_argument('--output', type=Path, default=Path('reports/latest'))
     parser.add_argument('--test-days', type=int, default=366)
     parser.add_argument('--horizon', type=int, default=7)

@@ -7,5 +7,7 @@ data/*
 data/processed/*
 !data/processed/daily_pm25.csv
 !data/processed/daily_pm25.manifest.json
+!data/processed/daily_aqi.csv
+!data/processed/daily_aqi.manifest.json
 models/
 reports/latest/

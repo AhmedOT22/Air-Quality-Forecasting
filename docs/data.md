@@ -1,3 +1,66 @@
+# AQI dataset: restored main objective
+
+The pollution-only concentration dataset above is now supplementary. The main input
+is `data/processed/daily_aqi.csv`, created by `aqi_data.py` through the default
+`python data_sources.py` command. It includes the original four pollutants: PM2.5,
+O3, NO2 and SO2. All four use Toronto West NAPS 060430. The gas exports do not
+supply instrument-method codes and may omit leading zeros on station IDs; IDs are
+normalized, while absent method metadata is explicitly recorded as not supplied.
+Coarser coordinate rounding in the gas exports is accepted only within 0.0001°
+across pollutants/years; a larger discrepancy fails preparation.
+
+## Exact index definition
+
+This is a **four-pollutant US EPA-based reconstruction**, retaining the original
+project scope. It is not Canada's AQHI and not an officially reported full city AQI.
+CO and PM10 are not included. A broader official reporting-area index may differ.
+
+The default `epa_2018` uses the version published in EPA 454/B-18-007, consistent
+with the PM2.5 breakpoint family in the original notebook. The alternative
+`epa_2024` follows the May 2024 PM2.5 breakpoints and is saved as `AQI_epa_2024`.
+Both apply one fixed definition to the whole archive; no hidden mid-series switch
+is made. This is a retrospective harmonized index, not a claim to reproduce the
+exact index published on every historical date.
+
+[2018 technical guidance](https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf)
+· [2024 technical guidance](https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf)
+
+| Component | Concentration summary | Unit/precision before interpolation |
+| --- | --- | --- |
+| PM2.5 | Daily mean, at least 18 valid hours | µg/m³, truncated to 0.1 |
+| NO2 | Daily maximum 1-hour, at least 18 valid hours | ppb, truncated to integer |
+| SO2 | Daily maximum 1-hour below 305 ppb; high values use 24-hour mean | ppb, truncated to integer |
+| O3 | Maximum of qualifying daily 8-hour and applicable 1-hour sub-indices | Convert ppb to ppm, truncate to 0.001 ppm |
+
+SO2 follows the documented exception: a maximum 1-hour value at/above 305 ppb
+with a daily mean below 305 ppb is assigned index 200. Higher daily means use the
+upper 24-hour bands. Undefined low one-hour ozone bands are ignored; eight-hour
+values cannot define index values above 300. Sub-indices are interpolated and
+rounded to integer using half-up rounding. Concentrations above the upper table
+are extrapolated rather than clipped at AQI 500.
+
+Ozone uses the **17 forward eight-hour windows starting at 07:00 through 23:00**
+on each local-standard day, including measurements into the next morning.
+A window needs at least six of eight valid hours; a day needs at least 13 of its
+17 valid windows. The daily one-hour ozone maximum also needs 18 valid hours.
+This is an explicit conservative completeness policy; exceptional regulatory
+missing-data substitutions are not implemented. The last archive day therefore
+has no complete AQI when the next morning is unavailable.
+
+A complete AQI is the maximum of the four component indices. Missing any component
+makes AQI missing. Dominant pollutant ties are retained with `|` separators.
+`aqi_available_after` is the following calendar day; forecasting conservatively
+uses the AQI only after that day is completed.
+
+The prepared manifest reports 1,709 complete AQI days and 118 missing days, along
+with per-component and per-year hourly coverage. See [the source assessment](source_comparison.md)
+for the comparison with the original inputs and the limits on source-quality claims.
+
+
+---
+
+# Supplementary PM2.5 analysis (not the main AQI target)
+
 # Sources, station identity, and preparation
 
 ## Official observations

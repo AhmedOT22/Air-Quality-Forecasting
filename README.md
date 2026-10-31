@@ -1,70 +1,76 @@
-# Toronto PM2.5 Forecasting
+# Toronto Air Quality Index Forecasting
 
-Forecasting daily mean **PM2.5 concentration at Toronto West**, using official
-NAPS pollution observations and Environment and Climate Change Canada weather
-observations. The reproducible snapshot covers **2020–2024**.
+Forecasting **AQI** from PM2.5, ozone, NO₂ and SO₂ at Toronto West. This restores
+the original project objective, using documented NAPS hourly observations and ECCC
+weather for **2020–2024**.
 
-[Executed notebook](AirQuality.ipynb) · [Data provenance](docs/data.md) ·
-[Evaluation design](docs/evaluation.md) · [2024 results](reports/2024/metrics.csv) ·
-[2023 results](reports/2023/metrics.csv)
+[Executed AQI notebook](AirQuality.ipynb) · [Source quality assessment](docs/source_comparison.md) ·
+[Data and index definition](docs/data.md) · [Evaluation](docs/evaluation.md)
 
-![2024 forecasting error by horizon](reports/2024/horizon_errors.png)
+![2024 AQI error by horizon](reports/aqi/2024/horizon_errors.png)
 
-## What changed
+## Target and source
 
-The current pipeline replaces the original undocumented CSV inputs and derived AQI
-with quality-assured NAPS PM2.5 and ECCC station weather observations. It forecasts
-concentration in **µg/m³**, not an official AQI/AQHI or public-health risk score.
+The target is an **EPA-based four-pollutant AQI reconstruction**, on the familiar
+AQI index scale. The same four pollutants as the original project are retained.
+This is not PM2.5 concentration, Canada's AQHI, or an official published city AQI.
+CO and PM10 are outside the original four-pollutant scope and are not silently claimed
+as included.
 
-- Station IDs, methods, source URLs, retrieval times, and checksums are recorded.
-- Daily targets require at least 18 valid hours. Missing targets stay missing.
-- Complementary instrument methods are combined by hour; conflicting readings fail validation.
-- Direct 1–7 day forecasts use pollution history and completed-origin-day weather.
-- Chronological 2023 and 2024 evaluations compare Ridge, Random Forest, persistence,
-  and weekly seasonal naïve on identical eligible pairs at each horizon.
-- A pollution-only forest provides a comparison for the weather-assisted forest.
+The default uses fixed **EPA 2018 breakpoints**, retaining the PM2.5 scale used by
+the original project while correcting aggregation and calculation errors. The
+alternative EPA 2024 definition is stored in a separate column, avoiding an
+unexplained breakpoint change inside the time series.
 
-## Results
+- PM2.5: 24-hour mean; NO₂: daily maximum 1-hour value.
+- SO₂: maximum 1-hour value at lower levels, with the documented 24-hour high-level rule.
+- Ozone: maximum eligible 8-hour mean, plus the applicable 1-hour sub-index.
+- Concentrations are truncated at the specified precision; sub-indices use linear
+  interpolation and integer half-up rounding. AQI is the maximum of all four indices.
+- A missing component makes the combined AQI unavailable; no missing target is imputed.
 
-MAE is in µg/m³; lower is better. These are retrospective benchmarks with fixed
-model settings, not real-time operational scores or estimates of health risk.
+The prepared snapshot has **1,827 calendar days**, **1,709 complete AQI targets**,
+and **118 missing targets**. Source metadata, methods, download times and checksums
+are committed. The raw national files are cached locally and excluded from Git.
 
-| Evaluation year | Horizon | Eligible forecasts | Ridge + weather | Forest + weather | Forest, pollution only | Persistence | Weekly naïve |
+## Does the new source improve the original project?
+
+NAPS provides documented quality-assured measurements and reproducible provenance.
+However, the old raw CSVs are absent, so we cannot certify superiority over the
+exact original files or claim a source-only accuracy gain. They may originate
+from the same monitoring network. See the [explicit comparison](docs/source_comparison.md).
+
+The evidence below evaluates **AQI forecasts**, not concentration forecasts. The
+old notebook's saved scores are not comparable because its index construction,
+missingness handling, and evaluation were different.
+
+## AQI forecasting results
+
+MAE is in **AQI points**, lower is better. Model settings are fixed; each year is
+evaluated with a fit using only earlier available targets. Models share the same
+eligible origin/target pairs within each horizon.
+
+| Year | Horizon | Eligible forecasts | Ridge + weather | Forest + weather | Index-only forest | Persistence | Weekly naïve |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 2023 | 1 day | 335 | 3.935 | 4.065 | 4.247 | 4.590 | 6.925 |
-| 2023 | 7 days | 326 | 4.921 | 4.859 | 4.825 | 7.008 | 7.008 |
-| 2024 | 1 day | 355 | 2.301 | 2.318 | 2.477 | 2.727 | 4.340 |
-| 2024 | 7 days | 348 | 3.233 | 3.250 | 3.185 | 4.353 | 4.353 |
+| 2023 | 1 day | 247 | 13.311 | 13.619 | 14.737 | 16.478 | 20.231 |
+| 2023 | 7 days | 232 | 14.714 | 14.436 | 14.409 | 20.319 | 21.586 |
+| 2024 | 1 day | 308 | 8.089 | 7.786 | 9.041 | 11.026 | 12.981 |
+| 2024 | 7 days | 302 | 9.607 | 9.816 | 9.814 | 13.192 | 12.344 |
 
-The one-day Ridge model reduced MAE relative to persistence by **14.3% in 2023**
-and **15.6% in 2024**. Adding weather helped the forest's one-day MAE in both years,
-but did not beat the pollution-only forest's seven-day MAE. There is no universal
-winner across models, metrics, and horizons.
+The weather-assisted forest improves one-day MAE over persistence by **29.4% in
+2024**. Ridge improves one-day MAE by **19.2% in 2023**. These are improvements over
+the same-source persistence baseline, **not evidence of improvement over the old dataset**.
+No model is claimed to be universally best.
 
-2023 has substantially larger errors than 2024. The model settings were not tuned
-on either evaluation year. Because 2023 observations enter training for the 2024
-benchmark, these are two chronological exercises, not independent replications.
-Full MAE, RMSE, skill scores, predictions, and monthly errors are committed in
-`reports/2023/` and `reports/2024/`.
+Ozone windows can extend into the following morning. Therefore AQI inputs and
+training labels are delayed **one full calendar day** in the backtest. Forecasts
+issued after completed day t use AQI no later than t−1 and predict t+1 through t+7.
+Weather features describe completed day t. This avoids using an AQI that was not
+available at the simulated forecast origin.
 
-## Data quality
+## Run the pipeline
 
-The prepared snapshot has **1,827 calendar days**, **1,801 observed PM2.5 targets**,
-and **26 missing targets**. Each weather feature has 1,826 qualifying daily means.
-Missing dates are retained so a one-day lag always means one calendar day.
-
-- **Pollution:** NAPS station `060430`, Toronto West, 125 Resources Road.
-- **Weather:** ECCC climate station `6158731`, Toronto Intl A (Pearson).
-- **Time:** local standard time, UTC−5, without daylight-saving shifts.
-- **Scope:** one monitoring site; it does not represent every Toronto neighbourhood.
-
-The two stations are approximately 7.9 km apart; airport weather is a proxy for
-conditions at the pollution site. NAPS method codes change during the period;
-this transition is recorded, not assumed to be perfectly homogeneous.
-
-## Run the complete pipeline
-
-Use Python 3.11 or newer from the repository root:
+Use Python 3.11+ from the repository root:
 
 ```bash
 python -m venv .venv
@@ -73,74 +79,57 @@ source .venv/bin/activate
 # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -r requirements-tested.txt
 
-# Download official raw observations, validate, and rebuild the prepared dataset
+# Default task is AQI: download all four pollutants, validate and reconstruct index
 python data_sources.py
-
-# Evaluate 2024, using only earlier observations for fitting
-python forecast.py --output reports/2024
-
-# Evaluate 2023, using only 2020–2022 for fitting
-python forecast.py --end-date 2023-12-31 --test-days 365 --output reports/2023
-
+python forecast.py --output reports/aqi/2024
+python forecast.py --end-date 2023-12-31 --test-days 365 --output reports/aqi/2023
 python -m unittest discover -s tests -v
 ```
 
-The small prepared snapshot and source manifest are committed, so the forecasting
-commands also work **offline** immediately after installation. Raw national files
-are cached under ignored `data/raw/`. Downloads retry transient failures and reject
-HTML responses, unexpected schemas, cache checksum changes, and truncated weather responses.
+The committed daily AQI snapshot enables forecasting offline. To intentionally
+refresh provider versions, use `python data_sources.py --refresh` and regenerate
+the results. To reconstruct the alternative fixed breakpoint version, use
+`--aqi-standard epa_2024 --output data/processed/daily_aqi_2024.csv`; do not compare
+its scores directly with another target definition as if only the data source changed.
 
-Providers can revise data under the same URL. To intentionally refresh source bytes,
-run `python data_sources.py --refresh`, then regenerate both benchmarks. Results
-may change; compare manifests rather than treating a refreshed download as identical.
-
-For Jupyter:
+For the notebook:
 
 ```bash
 python -m pip install -r requirements-notebook.txt
 jupyter lab AirQuality.ipynb
 ```
 
-The notebook runs preparation checks, exploratory plots, both benchmarks, and
-interpretation from the same Python functions. It does not maintain a second model pipeline.
-Its cells were executed sequentially with captured real outputs using
-`python scripts/execute_notebook.py`. This in-process check avoids sockets; normal
-Jupyter kernel startup could not be verified in the execution environment.
+The notebook uses the same functions. Its cells are verified sequentially with
+captured actual outputs through `python scripts/execute_notebook.py`. The execution
+environment blocks Jupyter kernel sockets, so kernel startup itself is not verified.
 
-## Outputs and structure
+## Project structure
 
 | Path | Purpose |
 | --- | --- |
-| `data_sources.py` | Official downloads, caching, station validation, hourly quality rules, daily preparation |
-| `forecast.py` | Feature availability, direct forecasting, chronological evaluation, reports |
-| `data/processed/daily_pm25.csv` | Frozen station-specific daily snapshot with coverage counts |
-| `data/processed/daily_pm25.manifest.json` | Source URLs/checksums, stations, methods, quality summary |
-| `AirQuality.ipynb` | Current executed analysis |
-| `reports/2023/`, `reports/2024/` | Published retrospective benchmark outputs |
-| `tests/` | Source-format, leakage, imputation, missingness, and report integration tests |
-| `notebooks/legacy/` | Archived original notebook/formulas; not the current pipeline |
+| `data_sources.py` | Download/cache entry point; AQI is the default task |
+| `aqi_data.py` | Station-specific four-pollutant hourly preparation and AQI dataset |
+| `aqi.py` | Versioned sub-indices, averaging windows, completeness and AQI combination |
+| `forecast.py` | Availability-aware direct forecasting and chronological backtests |
+| `data/processed/daily_aqi.csv` | AQI, component indices, concentrations, coverage and weather |
+| `data/processed/daily_aqi.manifest.json` | Source provenance and explicit target definition |
+| `reports/aqi/2023/`, `reports/aqi/2024/` | AQI predictions, metrics, plots, run settings |
+| `analysis/PM25.ipynb` | Separate supplementary concentration analysis |
+| `reports/2023/`, `reports/2024/` | Earlier PM2.5-only results, not AQI results |
+| `notebooks/legacy/` | Original exploration and formulas, retained for history |
 
-Each report directory includes `metrics.csv`, `backtest.csv`, `monthly_metrics.csv`,
-`run.json`, `backtest.png`, `horizon_errors.png`, and `forecast.csv`. The latter
-projects beyond its historical archive endpoint, **not today's date**.
+## Limits and attribution
 
-## Limits
+This is a single-site reconstruction with four pollutants, not a government-issued
+Toronto AQI or health advisory. Strict completeness and missing SO₂ observations
+reduce eligible days, especially in 2023. Instrument methods change within the
+period. Weather at Pearson is approximately 7.9 km from the pollution monitor.
+Overlapping forecasts are dependent; no statistical significance, calibrated
+uncertainty intervals or extreme-event warning capability is claimed.
 
-The benchmarks assume finalized observations are available after the completed
-origin day; publication delays and subsequent archive revisions are not simulated.
-Missing pollution history reduces eligible forecasts, and gaps can be non-random.
-Forecast errors at overlapping origins are dependent. No uncertainty intervals
-or validated extreme-event warning capability are claimed.
-
-The original exploration is archived with its saved outputs. Its old AQI accuracy
-claims are superseded and are not comparable with these concentration forecasts.
-
-## Attribution
-
-Source observations: **Environment and Climate Change Canada**, National Air Pollution
-Surveillance Program and Meteorological Service of Canada, accessed October 31, 2026.
-NAPS data: [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada).
-Weather: [ECCC data terms](https://climate.weather.gc.ca/prods_servs/attachment1_e.html).
-Prepared values and plots are derived from these sources; no government endorsement is implied.
+Source observations: Environment and Climate Change Canada, NAPS and Meteorological
+Service of Canada, accessed October 31, 2026. NAPS data are under the
+[Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada).
+No government endorsement is implied.
 
 Developed by [Ahmed Ouazzani](https://github.com/AhmedOT22).

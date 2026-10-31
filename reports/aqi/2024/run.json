@@ -1,0 +1,68 @@
+{
+  "input_sha256": "ccd5780bc8155b05a692f1dccf43933b99aa3c860e950f7881f37b86d0c364c0",
+  "target": "AQI",
+  "units": "AQI points",
+  "calendar_days": 1827,
+  "target_availability_delay_days": 1,
+  "aqi_standard": "epa_2018",
+  "observed_target_days": 1709,
+  "missing_target_days": 118,
+  "start": "2020-01-01",
+  "end": "2024-12-31",
+  "train_end": "2023-12-31",
+  "holdout_start": "2024-01-01",
+  "test_days": 366,
+  "horizon": 7,
+  "trees": 200,
+  "seed": 42,
+  "ridge_alpha": 10,
+  "pollution_lags_calendar_days": [
+    1,
+    2,
+    3,
+    7,
+    14
+  ],
+  "lags_relative_to_latest_available_target": [
+    0,
+    1,
+    2,
+    6,
+    13
+  ],
+  "weather_fields": [
+    "temperature_c",
+    "humidity_pct",
+    "wind_speed_kmh",
+    "pressure_kpa"
+  ],
+  "training_samples_by_horizon": {
+    "1": 1039,
+    "2": 1033,
+    "3": 1029,
+    "4": 1028,
+    "5": 1026,
+    "6": 1023,
+    "7": 1019
+  },
+  "eligible_pairs_by_horizon": {
+    "1": 308,
+    "2": 305,
+    "3": 304,
+    "4": 303,
+    "5": 303,
+    "6": 303,
+    "7": 302
+  },
+  "evaluation": "Fixed pre-holdout fit; separate direct models per horizon; observed targets only",
+  "availability_assumption": "Target values delayed 1 full day(s); origin-day weather available. Additional publication latency/revisions not simulated",
+  "weather_imputation": "Training-only median + missing indicators; no target imputation",
+  "forecast_status": "Archive-end projection; not a current forecast",
+  "python": "3.12.14",
+  "packages": {
+    "pandas": "2.2.3",
+    "numpy": "2.3.5",
+    "scikit-learn": "1.8.0",
+    "matplotlib": "3.10.8"
+  }
+}

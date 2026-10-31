@@ -1,3 +1,53 @@
+# Restored AQI benchmark
+
+The PM2.5 concentration results above remain supplementary under `reports/2023/`
+and `reports/2024/`. The main benchmark now uses `daily_aqi.csv` and writes
+`reports/aqi/2023/` and `reports/aqi/2024/`. Its errors are **AQI points**, not µg/m³.
+
+The index retains the original four-pollutant scope, with an explicit fixed
+EPA-2018-based definition and a separate EPA-2024 sensitivity column. It is not a
+full official Toronto AQI or Canada's AQHI.
+
+## Availability correction
+
+Ozone windows for day D can extend into D+1 at 07:00. Therefore, after completed
+origin day t, the latest index allowed into features is **AQI(t−1)**. The lag feature
+set relative to origin t is 1, 2, 3, 7 and 14 days, plus the seven-day mean ending
+t−1. Calendar features still describe the future target date. Completed day t
+weather is available, but no future observed weather is used.
+
+Training also respects this delay: an AQI label for day D is eligible for fitting
+only if D+1 is at/before the fitting boundary. Otherwise the training target could
+already contain post-boundary ozone observations. Tests mutate the unavailable
+current-origin index as well as future labels to verify first-trajectory invariance.
+
+Persistence repeats the latest available AQI(t−1). Weekly naïve repeats the latest
+available seven-day pattern. At horizon seven, AQI(target−7) would be AQI(t), which
+is still unavailable, so the baseline uses the preceding available week instead.
+All models share exactly the same eligible origin/target pairs within each horizon.
+
+The 2023 exercise has 247 one-day and 232 seven-day pairs; 2024 has 308 and 302.
+This reduction relative to PM2.5 is expected: all four pollutant components and the
+required lag history must be available. Missing SO2 is a substantial 2023 limitation.
+Scores are conditional on this observed subset.
+
+## Interpreting the results correctly
+
+In 2024, one-day forest+weather MAE is 7.786 AQI points against persistence 11.026,
+a 29.4% reduction. In 2023, one-day Ridge MAE is 13.311 against persistence 16.478,
+a 19.2% reduction. These describe performance against same-source baselines only.
+
+The old data source's raw files are unavailable. The original saved scores used a
+different index construction, imputation and evaluation protocol. Neither the new
+AQI metrics nor the earlier PM2.5 metrics establish that replacing the source alone
+improved forecast accuracy. A source-only experiment requires common observed dates,
+the same fixed AQI definition, and identical fitting/availability rules on both inputs.
+
+
+---
+
+# Supplementary PM2.5 analysis (not the main AQI target)
+
 # Evaluation and interpretation
 
 ## Task

@@ -24,3 +24,17 @@ class SnapshotTests(unittest.TestCase):
         for source in metadata['sources']:
             self.assertEqual(len(source['sha256']), 64)
             self.assertTrue(source['url'].startswith('https://'))
+
+    def test_aqi_snapshot_preserves_four_component_definition(self):
+        import pandas as pd
+        path = ROOT / 'data/processed/daily_aqi.csv'
+        metadata = json.loads(path.with_suffix('.manifest.json').read_text())
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), metadata['prepared_sha256'])
+        data = load_data(path)
+        columns = ['PM25_AQI','O3_AQI','NO2_AQI','SO2_AQI']
+        complete = data[columns].notna().all(axis=1)
+        self.assertTrue(data.loc[~complete, 'AQI'].isna().all())
+        pd.testing.assert_series_equal(data.loc[complete, 'AQI'],
+                                       data.loc[complete, columns].max(axis=1), check_names=False)
+        self.assertEqual(int(data.AQI.notna().sum()), metadata['observed_target_days'])
+        self.assertEqual(metadata['aqi_availability_delay_days'], 1)

@@ -267,13 +267,24 @@ def main():
     parser.add_argument('--start-year', type=int, default=2020)
     parser.add_argument('--end-year', type=int, default=2024)
     parser.add_argument('--raw-dir', type=Path, default=Path('data/raw'))
-    parser.add_argument('--output', type=Path, default=Path('data/processed/daily_pm25.csv'))
+    parser.add_argument('--output', type=Path)
+    parser.add_argument('--target', choices=['AQI', 'PM25'], default='AQI')
+    parser.add_argument('--aqi-standard', choices=['epa_2018', 'epa_2024'], default='epa_2018')
     parser.add_argument('--min-hours', type=int, default=18)
     parser.add_argument('--refresh', action='store_true')
     args = parser.parse_args()
     try:
-        _, report = prepare(args.start_year, args.end_year, args.raw_dir, args.output,
-                            min_hours=args.min_hours, refresh=args.refresh)
+        if args.target == 'AQI':
+            if args.min_hours != 18:
+                raise ValueError('AQI preparation fixes 18-hour daily coverage; do not silently change its definition')
+            from aqi_data import prepare_aqi
+            _, report = prepare_aqi(args.start_year, args.end_year, args.raw_dir,
+                                    args.output or 'data/processed/daily_aqi.csv',
+                                    standard=args.aqi_standard, refresh=args.refresh)
+        else:
+            _, report = prepare(args.start_year, args.end_year, args.raw_dir,
+                                args.output or 'data/processed/daily_pm25.csv',
+                                min_hours=args.min_hours, refresh=args.refresh)
         print(json.dumps({k: report[k] for k in ('calendar_days', 'observed_target_days', 'missing_target_days')}, indent=2))
     except (ValueError, OSError, KeyError) as error:
         parser.exit(2, f'Data preparation failed: {error}\n')
