@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
-from aqi import daily_aqi
+from aqi import DEFAULT_STANDARD, STANDARD_REFERENCES, daily_aqi
 from data_sources import DEFAULT_STATION, download, naps_url, prepare as prepare_pm25
 
 
@@ -60,7 +60,9 @@ def read_hourly(content, pollutant, station_id=DEFAULT_STATION):
 
 
 def prepare_aqi(start_year=2020, end_year=2024, raw_dir='data/raw',
-                output='data/processed/daily_aqi.csv', standard='epa_2018', refresh=False):
+                output='data/processed/daily_aqi.csv', standard=DEFAULT_STANDARD, refresh=False):
+    if standard not in STANDARD_REFERENCES:
+        raise ValueError('Unknown AQI breakpoint version')
     raw = Path(raw_dir)
     weather, pm_manifest = prepare_pm25(start_year, end_year, raw_dir,
                                        'data/processed/daily_pm25.csv', refresh=refresh)
@@ -93,15 +95,27 @@ def prepare_aqi(start_year=2020, end_year=2024, raw_dir='data/raw',
     # A fixed alternative version makes the breakpoint sensitivity explicit,
     # rather than introducing an unexplained definition change in May 2024.
     alternate = 'epa_2024' if standard == 'epa_2018' else 'epa_2018'
-    daily[f'AQI_{alternate}'] = daily_aqi(hourly, alternate).AQI
+    alternative = daily_aqi(hourly, alternate)
+    daily[f'AQI_{alternate}'] = alternative.AQI
+    comparable = daily.AQI.notna() & alternative.AQI.notna()
+    comparison = {
+        'standard': alternate,
+        'column': f'AQI_{alternate}',
+        'complete_days_compared': int(comparable.sum()),
+        'changed_aqi_days': int(daily.loc[comparable, 'AQI'].ne(alternative.loc[comparable, 'AQI']).sum()),
+        'changed_category_days': int(daily.loc[comparable, 'AQI_category'].ne(alternative.loc[comparable, 'AQI_category']).sum()),
+        'maximum_absolute_difference': float((daily.AQI - alternative.AQI).abs().max()),
+    }
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     daily.to_csv(output, float_format='%.8f')
     report = {'target': 'AQI', 'units': 'AQI points', 'standard': standard,
               'scope': 'Maximum of the original four pollutants: PM2.5, O3, NO2, SO2; CO and PM10 excluded',
               'status': 'EPA-based reconstruction at Toronto West; not an official published Toronto AQI or Canadian AQHI',
-              'standard_reference': 'https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf',
-              'alternative_reference': 'https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf',
+              'standard_reference': STANDARD_REFERENCES[standard],
+              'alternative_reference': STANDARD_REFERENCES[alternate],
+              'breakpoint_comparison': comparison,
+              'standard_application': 'Fixed breakpoint version applied retrospectively to every archive year',
               'minimum_daily_hours': 18, 'ozone_hours_per_8h_window': 6,
               'ozone_daily_windows': '13 of 17 start-hour windows, 07:00–23:00, including next morning',
               'aqi_availability_delay_days': 1, 'calendar_days': len(daily),

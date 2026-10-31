@@ -8,7 +8,12 @@ from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
 import numpy as np
 import pandas as pd
 
+DEFAULT_STANDARD = 'epa_2024'
 STANDARDS = ('epa_2018', 'epa_2024')
+STANDARD_REFERENCES = {
+    'epa_2018': 'https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf',
+    'epa_2024': 'https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf',
+}
 INDEX_BANDS = [(0, 50), (51, 100), (101, 150), (151, 200), (201, 300), (301, 400), (401, 500)]
 PM25_2018 = [(0, 12), (12.1, 35.4), (35.5, 55.4), (55.5, 150.4),
              (150.5, 250.4), (250.5, 350.4), (350.5, 500.4)]
@@ -43,7 +48,7 @@ def concentration_index(value, breakpoints, bands, decimals, extrapolate=False):
     return int(index.quantize(Decimal(1), rounding=ROUND_HALF_UP))
 
 
-def pm25_index(mean_24h, standard='epa_2018'):
+def pm25_index(mean_24h, standard=DEFAULT_STANDARD):
     if standard not in STANDARDS:
         raise ValueError('Unknown AQI breakpoint version')
     if standard == 'epa_2024':
@@ -85,7 +90,7 @@ def category(value):
     return 'Hazardous'
 
 
-def daily_aqi(hourly, standard='epa_2018'):
+def daily_aqi(hourly, standard=DEFAULT_STANDARD):
     """Four-pollutant AQI; strict component completeness, no partial maxima.
 
     Hourly indices are interval-start timestamps in fixed local standard time.

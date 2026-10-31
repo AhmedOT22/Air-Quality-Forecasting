@@ -38,3 +38,15 @@ class SnapshotTests(unittest.TestCase):
                                        data.loc[complete, columns].max(axis=1), check_names=False)
         self.assertEqual(int(data.AQI.notna().sum()), metadata['observed_target_days'])
         self.assertEqual(metadata['aqi_availability_delay_days'], 1)
+        from aqi import DEFAULT_STANDARD, category, pm25_index
+        self.assertEqual(metadata['standard'], DEFAULT_STANDARD)
+        self.assertTrue(data.aqi_standard.eq(DEFAULT_STANDARD).all())
+        pd.testing.assert_series_equal(data.PM25_AQI, data.PM25_mean_24h.map(pm25_index), check_names=False)
+        legacy_components = data[columns].copy()
+        legacy_components['PM25_AQI'] = data.PM25_mean_24h.map(lambda value: pm25_index(value, 'epa_2018'))
+        legacy = legacy_components.max(axis=1).where(complete)
+        pd.testing.assert_series_equal(data.AQI_epa_2018, legacy, check_names=False)
+        pd.testing.assert_series_equal(data.AQI_category, data.AQI.map(category), check_names=False)
+        comparison = metadata['breakpoint_comparison']
+        self.assertEqual(comparison['changed_aqi_days'], int(data.loc[complete, 'AQI'].ne(legacy[complete]).sum()))
+        self.assertEqual(comparison['changed_category_days'], int(data.loc[complete, 'AQI_category'].ne(legacy[complete].map(category)).sum()))

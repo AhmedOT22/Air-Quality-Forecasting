@@ -269,7 +269,8 @@ def main():
     parser.add_argument('--raw-dir', type=Path, default=Path('data/raw'))
     parser.add_argument('--output', type=Path)
     parser.add_argument('--target', choices=['AQI', 'PM25'], default='AQI')
-    parser.add_argument('--aqi-standard', choices=['epa_2018', 'epa_2024'], default='epa_2018')
+    from aqi import DEFAULT_STANDARD, STANDARDS
+    parser.add_argument('--aqi-standard', choices=STANDARDS, default=DEFAULT_STANDARD)
     parser.add_argument('--min-hours', type=int, default=18)
     parser.add_argument('--refresh', action='store_true')
     args = parser.parse_args()

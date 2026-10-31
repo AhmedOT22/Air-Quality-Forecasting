@@ -1,11 +1,20 @@
 {
   "target": "AQI",
   "units": "AQI points",
-  "standard": "epa_2018",
+  "standard": "epa_2024",
   "scope": "Maximum of the original four pollutants: PM2.5, O3, NO2, SO2; CO and PM10 excluded",
   "status": "EPA-based reconstruction at Toronto West; not an official published Toronto AQI or Canadian AQHI",
-  "standard_reference": "https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf",
-  "alternative_reference": "https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf",
+  "standard_reference": "https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf",
+  "alternative_reference": "https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf",
+  "breakpoint_comparison": {
+    "standard": "epa_2018",
+    "column": "AQI_epa_2018",
+    "complete_days_compared": 1709,
+    "changed_aqi_days": 1018,
+    "changed_category_days": 221,
+    "maximum_absolute_difference": 13.0
+  },
+  "standard_application": "Fixed breakpoint version applied retrospectively to every archive year",
   "minimum_daily_hours": 18,
   "ozone_hours_per_8h_window": 6,
   "ozone_daily_windows": "13 of 17 start-hour windows, 07:00–23:00, including next morning",
@@ -565,6 +574,6 @@
       "bytes": 7137745
     }
   ],
-  "prepared_sha256": "ccd5780bc8155b05a692f1dccf43933b99aa3c860e950f7881f37b86d0c364c0",
-  "prepared_at": "2026-10-31T14:27:33.150184+00:00"
+  "prepared_sha256": "062bc813c063e1af5dd8874271af65f82240f4a1ac861bb1848c102e442caceb",
+  "prepared_at": "2026-10-31T15:16:40.806531+00:00"
 }

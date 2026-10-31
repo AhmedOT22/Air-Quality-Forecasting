@@ -35,6 +35,32 @@ class AQITests(unittest.TestCase):
         self.assertEqual(pm25_index(325.4, 'epa_2024'), 500)
         self.assertGreater(pm25_index(800), 500)
         self.assertEqual(no2_index(53.9), 50)
+        # EPA's published 2024 table, including the combined hazardous band.
+        for concentration, expected in [(0, 0), (9, 50), (9.1, 51), (35.4, 100),
+                                        (35.5, 101), (55.4, 150), (55.5, 151),
+                                        (125.4, 200), (125.5, 201), (225.4, 300),
+                                        (225.5, 301), (325.4, 500)]:
+            with self.subTest(concentration=concentration):
+                self.assertEqual(pm25_index(concentration), expected)
+
+
+    def test_2024_defaults_recompute_components_categories_and_dominance(self):
+        frame = hourly_fixture()
+        frame.PM25 = 12
+        frame.O3 = 0
+        frame.NO2 = 53
+        current = daily_aqi(frame).loc['2023-12-31']
+        legacy = daily_aqi(frame, 'epa_2018').loc['2023-12-31']
+        self.assertEqual(pm25_index(12), 56)
+        self.assertEqual(current.aqi_standard, 'epa_2024')
+        self.assertEqual(current.PM25_AQI, 56)
+        self.assertEqual(current.AQI, 56)
+        self.assertEqual(current.AQI_category, 'Moderate')
+        self.assertEqual(current.dominant_pollutant, 'PM25')
+        self.assertEqual(legacy.AQI, 50)
+        self.assertEqual(legacy.AQI_category, 'Good')
+        self.assertEqual(legacy.dominant_pollutant, 'PM25|NO2')
+        self.assertEqual(current.aqi_available_after, legacy.aqi_available_after)
 
     def test_so2_uses_peak_at_low_values_and_daily_mean_at_high_values(self):
         self.assertEqual(so2_index(304, 20), 200)
