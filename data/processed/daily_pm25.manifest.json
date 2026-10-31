@@ -1,0 +1,254 @@
+{
+  "target": "Daily mean PM2.5 concentration",
+  "units": "µg/m³",
+  "start": "2020-01-01",
+  "end": "2024-12-31",
+  "time_basis": "Local standard time UTC-5; no daylight saving shifts",
+  "minimum_hours_per_day": 18,
+  "calendar_days": 1827,
+  "observed_target_days": 1801,
+  "missing_target_days": 26,
+  "target_imputation": "none",
+  "naps_station": {
+    "NAPS_ID": "060430",
+    "Station_Name": "TORONTO WEST - 125 RESOURCES. RD.",
+    "Status": "1",
+    "Location_Address": "125 RESOURCES ROAD",
+    "City": "TORONTO",
+    "Province/Territory_EN": "ONTARIO",
+    "Province/territoire_FR": "ONTARIO",
+    "Postal_Code": "M9P 3V6",
+    "Timezone_UTC": "-5",
+    "Latitude": "43.709444",
+    "Longitude": "-79.5435",
+    "Elevation_m": "141",
+    "Start_Date": "2000-01-01",
+    "End_Date": "",
+    "Combined_Stations": "",
+    "Inlet_Height_m": "8",
+    "Network": "N",
+    "SO2": "X",
+    "CO": "X",
+    "NO2": "X",
+    "NO": "X",
+    "NOX": "X",
+    "O3": "X",
+    "PM2.5_Continuous": "X",
+    "PM10_Continuous": "X",
+    "PM2.5_RM": "H",
+    "PM10_Integrated": "",
+    "PM2.5-10": "",
+    "PM2.5_Speciation": "",
+    "VOC": "",
+    "Carbonyl": "",
+    "PAC": "H",
+    "Site_Type": "PE",
+    "Urbanization": "LU",
+    "Neighbourhood": "P6",
+    "Land_Use": "C",
+    "Scale": "N",
+    "PC": "0944. Toronto",
+    "CD": "20. Toronto",
+    "CSD": "005. Toronto, C",
+    "CMA/CA": "535. Toronto, CMA/RMR",
+    "AQMS_Airzone": "Ontario - Southern",
+    "Core_Site": ""
+  },
+  "weather_station": {
+    "type": "Feature",
+    "properties": {
+      "STN_ID": 51459,
+      "STATION_NAME": "TORONTO INTL A",
+      "PROV_STATE_TERR_CODE": "ON",
+      "ENG_PROV_NAME": "ONTARIO",
+      "FRE_PROV_NAME": "ONTARIO",
+      "COUNTRY": "CAN",
+      "LATITUDE": 434036000,
+      "LONGITUDE": -793750000,
+      "TIMEZONE": "EST",
+      "ELEVATION": "173.40",
+      "CLIMATE_IDENTIFIER": "6158731",
+      "TC_IDENTIFIER": "YYZ",
+      "WMO_IDENTIFIER": "71624",
+      "STATION_TYPE": "Aviation-Staffed",
+      "NORMAL_CODE": null,
+      "PUBLICATION_CODE": null,
+      "DISPLAY_CODE": null,
+      "ENG_STN_OPERATOR_ACRONYM": "NAVCAN",
+      "FRE_STN_OPERATOR_ACRONYM": "NAVCAN",
+      "ENG_STN_OPERATOR_NAME": "NAV Canada",
+      "FRE_STN_OPERATOR_NAME": "NAV Canada",
+      "FIRST_DATE": "2013-06-11 09:00:00",
+      "LAST_DATE": "2026-10-29 12:30:10",
+      "HLY_FIRST_DATE": "2013-06-11 09:00:00",
+      "HLY_LAST_DATE": "2026-10-29 12:30:10",
+      "DLY_FIRST_DATE": "2013-06-13 00:00:00",
+      "DLY_LAST_DATE": "2026-10-29 00:00:00",
+      "MLY_FIRST_DATE": null,
+      "MLY_LAST_DATE": null,
+      "HAS_MONTHLY_SUMMARY": "Y",
+      "HAS_NORMALS_DATA": "N",
+      "HAS_HOURLY_DATA": "Y"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -79.63055555555556,
+        43.67666666666667
+      ]
+    },
+    "id": "6158731"
+  },
+  "annual_quality": [
+    {
+      "methods": [
+        "184"
+      ],
+      "latitude": 43.70944,
+      "longitude": -79.5435,
+      "rejected_negative_hours_excluding_sentinel": 0,
+      "valid_days": 358,
+      "days": 366,
+      "year": 2020
+    },
+    {
+      "methods": [
+        "184"
+      ],
+      "latitude": 43.70944,
+      "longitude": -79.5435,
+      "rejected_negative_hours_excluding_sentinel": 0,
+      "valid_days": 360,
+      "days": 365,
+      "year": 2021
+    },
+    {
+      "methods": [
+        "184",
+        "636"
+      ],
+      "latitude": 43.70944,
+      "longitude": -79.5435,
+      "rejected_negative_hours_excluding_sentinel": 0,
+      "valid_days": 360,
+      "days": 365,
+      "year": 2022
+    },
+    {
+      "methods": [
+        "636"
+      ],
+      "latitude": 43.70944,
+      "longitude": -79.5435,
+      "rejected_negative_hours_excluding_sentinel": 0,
+      "valid_days": 359,
+      "days": 365,
+      "year": 2023
+    },
+    {
+      "methods": [
+        "636"
+      ],
+      "latitude": 43.70944,
+      "longitude": -79.5435,
+      "rejected_negative_hours_excluding_sentinel": 0,
+      "valid_days": 364,
+      "days": 366,
+      "year": 2024
+    }
+  ],
+  "weather_observed_days": {
+    "temperature_c": 1826,
+    "humidity_pct": 1826,
+    "wind_speed_kmh": 1826,
+    "pressure_kpa": 1826
+  },
+  "prepared_sha256": "a09c73b621c2a90ea9b42956e8b56bdb7e4e20216e4d783f7192d2b4fb8e4518",
+  "sources": [
+    {
+      "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FProgramInformation-InformationProgramme%2FStationsNAPS-StationsSNPA.csv",
+      "sha256": "444e9dbb4e84d3317e21c724f76c2fad7b64b7b17d78d39b9f33e1f928420219",
+      "downloaded_at": "2026-10-31T13:55:25.430855+00:00",
+      "last_modified": null,
+      "bytes": 268463
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-stations/items?f=json&CLIMATE_IDENTIFIER=6158731&limit=10",
+      "sha256": "c842c951b7e0062938c1208d7294ffd1de147e25feaa046c8c23c6f931465292",
+      "downloaded_at": "2026-10-31T13:50:21.124255+00:00",
+      "last_modified": null,
+      "bytes": 1865
+    },
+    {
+      "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2020%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2020.csv",
+      "sha256": "737745d6bf5a869192869a7522bf14b94b49826f4619c3b8cb817970f6f15faf",
+      "downloaded_at": "2026-10-31T13:55:26.411224+00:00",
+      "last_modified": null,
+      "bytes": 11471289
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2020&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "49622b8ccf880adb56207cf454777852851fd54c8208be1dffb4f49c52111c0c",
+      "downloaded_at": "2026-10-31T13:51:59.076984+00:00",
+      "last_modified": null,
+      "bytes": 3364841
+    },
+    {
+      "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2021%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2021.csv",
+      "sha256": "b05f0f5eac83c3ea6efbf0587c4e9d30c5795981c47611da521da28123d17d52",
+      "downloaded_at": "2026-10-31T13:55:32.244097+00:00",
+      "last_modified": null,
+      "bytes": 10149208
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2021&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "b10d9e56b4d3ab70b7b65764e2f29b903c576a04e45e235c5469ae2ba1aa8479",
+      "downloaded_at": "2026-10-31T13:51:59.252909+00:00",
+      "last_modified": null,
+      "bytes": 3355367
+    },
+    {
+      "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2022%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2022.csv",
+      "sha256": "7414b3b7bb78c3d2fd2788e5fc421e724433f34f1a98e49283e59e2e138318cd",
+      "downloaded_at": "2026-10-31T13:55:26.538813+00:00",
+      "last_modified": null,
+      "bytes": 12339077
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2022&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "ddd78889f11d37ac534e017e78cb6b96d765f903f538f516cd7b1ecac72a1d56",
+      "downloaded_at": "2026-10-31T13:52:03.679752+00:00",
+      "last_modified": null,
+      "bytes": 3354041
+    },
+    {
+      "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2023%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2023.csv",
+      "sha256": "9d87fd544c88bb42aa16aac092838e75bff65a624ffc670e6563a9adc036535a",
+      "downloaded_at": "2026-10-31T13:55:32.664441+00:00",
+      "last_modified": null,
+      "bytes": 14824404
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2023&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "fa8cce0b870c58e2f76b8a029594bbf7cb3bdb7b16f4ef9e0b051ebd71a10f53",
+      "downloaded_at": "2026-10-31T13:52:03.622019+00:00",
+      "last_modified": null,
+      "bytes": 3356007
+    },
+    {
+      "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2024%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2024.csv",
+      "sha256": "b52e88c4394a339640ce4cf99e8dc9540f2a1769d80e355b0db524d4cbc1ebea",
+      "downloaded_at": "2026-10-31T13:55:32.336803+00:00",
+      "last_modified": null,
+      "bytes": 9690501
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2024&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "cec310ffa1b0aea9afd259469bbc0848241a9e284639a2e66a6ad187c27160e0",
+      "downloaded_at": "2026-10-31T13:52:07.254799+00:00",
+      "last_modified": null,
+      "bytes": 3364995
+    }
+  ],
+  "prepared_at": "2026-10-31T13:57:18.279119+00:00"
+}

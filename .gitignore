@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
-data/
+data/*
+!data/processed/
+data/processed/*
+!data/processed/daily_pm25.csv
+!data/processed/daily_pm25.manifest.json
 models/
 reports/latest/
