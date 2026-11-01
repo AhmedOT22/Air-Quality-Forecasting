@@ -104,7 +104,7 @@
   "start": "2020-01-01",
   "end": "2026-10-31",
   "requested_ontario_end": "2026-11-01",
-  "latest_pollution_hour_est": "2026-11-01 10:00:00",
+  "latest_pollution_hour_est": "2026-11-01 14:00:00",
   "time_basis": "Fixed local standard time UTC-5, hour-ending intervals stored at interval starts",
   "source_priority": "NAPS 2020-2024 including its gaps; Ontario from 2025 onward; no overlap averaging",
   "ontario_station_id": "35125",
@@ -124,7 +124,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 515,
-      "valid_hours": 59064,
+      "valid_hours": 59068,
       "units": "micrograms per cubic metre",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
@@ -141,7 +141,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 782,
-      "valid_hours": 58797,
+      "valid_hours": 58801,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
@@ -158,7 +158,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 849,
-      "valid_hours": 58730,
+      "valid_hours": 58734,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
@@ -175,7 +175,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 2176,
-      "valid_hours": 57403,
+      "valid_hours": 57407,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     }
@@ -240,7 +240,7 @@
     }
   },
   "hourly_file": "hourly_pollution_2020_latest.csv.gz",
-  "hourly_sha256": "886c5ffc70d90adde866f49d5fe9f10633f1cc71d3dd727c78aa0290ae7c4c34",
+  "hourly_sha256": "8f8758c153ba8f9a4a5793acd738ceffdd6c82a0eb22e32c37429b3e29b50340",
   "prepared_sha256": "eba0075f4fe4d7a5f11e88573206ccba9fa35fb4a3848f1842a5f6b4d4092946",
   "sources": [
     {
@@ -399,31 +399,31 @@
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=124&s_startDate=2020-01-01&s_endDate=2026-11-01&s_reportType=CSV",
-      "sha256": "bd42e0e2d7cf8d9928038e4ef8d81148eed91e6dfa3577ededface22cdd85ca8",
-      "downloaded_at": "2026-11-01T17:08:12.229042+00:00",
+      "sha256": "24ebbf8d7e06f0eef773b34f78c7733552451b84f135612a38a8f30f855563af",
+      "downloaded_at": "2026-11-01T21:12:00.044001+00:00",
       "last_modified": null,
-      "bytes": 242677
+      "bytes": 242685
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=122&s_startDate=2020-01-01&s_endDate=2026-11-01&s_reportType=CSV",
-      "sha256": "54d044dc830ed37a6b8950bbf4d267670618a04db3719dd640d501b9d8b111cc",
-      "downloaded_at": "2026-11-01T17:08:17.208018+00:00",
+      "sha256": "54ab07555e310b41f0c6b685388ccadcb51393f2c19edd193d5ea1c4e19ca4a0",
+      "downloaded_at": "2026-11-01T21:12:04.724230+00:00",
       "last_modified": null,
-      "bytes": 231702
+      "bytes": 231714
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=36&s_startDate=2020-01-01&s_endDate=2026-11-01&s_reportType=CSV",
-      "sha256": "479cb123443d2c9d7771477d105a5e2320a3f15f4bab576d9b324e7167daf9ce",
-      "downloaded_at": "2026-11-01T17:08:22.067236+00:00",
+      "sha256": "5865a1c6e7e1bc902007d422b69767e21e63d2e9ada9c47eb31b57005fba01c2",
+      "downloaded_at": "2026-11-01T21:12:09.111164+00:00",
       "last_modified": null,
-      "bytes": 348326
+      "bytes": 348344
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=9&s_startDate=2020-01-01&s_endDate=2026-11-01&s_reportType=CSV",
-      "sha256": "e22276b40e694e1a1fe536576df028d1405c96db039537a58afa376d7347bd78",
-      "downloaded_at": "2026-11-01T17:08:26.321920+00:00",
+      "sha256": "a6e8fce8fec9f901ebe24327f3909379f10c74646f5a3e33a36291cf4d9d3111",
+      "downloaded_at": "2026-11-01T21:12:13.201088+00:00",
       "last_modified": null,
-      "bytes": 279310
+      "bytes": 279324
     },
     {
       "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2020&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
@@ -462,18 +462,18 @@
     },
     {
       "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2025&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "63b8035f74f769600d9812e988302cf5778aa955d3e178d7dea7c829162747d1",
-      "downloaded_at": "2026-11-01T17:08:28.691757+00:00",
+      "sha256": "6c203e369e469c4d79f5f7ac40a31f711fe8a2fc107d2748566695b7c9c4b565",
+      "downloaded_at": "2026-11-01T21:12:15.122328+00:00",
       "last_modified": null,
       "bytes": 3356446
     },
     {
       "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2026&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "0db22e29c310a729b4b5641b9ddea0b015965f7b4a67f1c704b3abfd0acdde41",
-      "downloaded_at": "2026-11-01T17:08:30.103066+00:00",
+      "sha256": "02ee8faed85733a607d47cbe6aff221bf71b4a5fadd969433d43f404ce83047b",
+      "downloaded_at": "2026-11-01T21:12:16.144228+00:00",
       "last_modified": null,
       "bytes": 2794989
     }
   ],
-  "prepared_at": "2026-11-01T17:08:30.925379+00:00"
+  "prepared_at": "2026-11-01T21:12:17.103149+00:00"
 }
