@@ -1,12 +1,12 @@
 {
-  "attempted_at": "2026-11-01T21:11:55.193399+00:00",
+  "attempted_at": "2026-11-02T20:47:30.165786+00:00",
   "publication_status": "current",
   "contract_version": 1,
-  "origin": "2026-10-31",
-  "pollution_age_hours": 1.2047790358333332,
-  "issued_rows": 0,
+  "origin": "2026-11-01",
+  "pollution_age_hours": 0.7972500925,
+  "issued_rows": 14,
   "prospective_scores": 0,
   "weather_status": "issued_experimental_challenger",
-  "input_sha256": "eba0075f4fe4d7a5f11e88573206ccba9fa35fb4a3848f1842a5f6b4d4092946",
+  "input_sha256": "d21725d35122657cf0493000c811eae3ddeb562a5e15987c7aa9b172dd25521d",
   "note": "First issuance retained; same-day forecasts excluded from prospective metrics; unverified truth can be revised"
 }
