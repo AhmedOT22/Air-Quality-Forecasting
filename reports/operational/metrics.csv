@@ -1,1 +1,3 @@
 model,model_id,horizon,n,MAE,RMSE,persistence_MAE,weekly_MAE,MAE_skill,interval_n,interval_coverage
+ridge_1,27216e6da65e0463,2,1,3.2680312918827354,3.2680312918827354,20.0,12.0,0.8365984354058632,1,1.0
+ridge_forecast_weather_1,2349b1691c8cb3a3,2,1,6.366864981468858,6.366864981468858,20.0,12.0,0.6816567509265571,0,
