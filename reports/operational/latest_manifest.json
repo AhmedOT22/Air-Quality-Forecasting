@@ -102,9 +102,9 @@
     "id": "6158731"
   },
   "start": "2020-01-01",
-  "end": "2026-11-02",
-  "requested_ontario_end": "2026-11-03",
-  "latest_pollution_hour_est": "2026-11-03 12:00:00",
+  "end": "2026-11-03",
+  "requested_ontario_end": "2026-11-04",
+  "latest_pollution_hour_est": "2026-11-04 12:00:00",
   "time_basis": "Fixed local standard time UTC-5, hour-ending intervals stored at interval starts",
   "source_priority": "NAPS 2020-2024 including its gaps; Ontario from 2025 onward; no overlap averaging",
   "ontario_station_id": "35125",
@@ -113,7 +113,7 @@
   "quality": [
     {
       "pollutant": "PM25",
-      "received_daily_rows": 2499,
+      "received_daily_rows": 2500,
       "quarantined_duplicate_dates": [
         "2020-06-22",
         "2022-04-21",
@@ -124,13 +124,13 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 515,
-      "valid_hours": 59114,
+      "valid_hours": 59138,
       "units": "micrograms per cubic metre",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
     {
       "pollutant": "O3",
-      "received_daily_rows": 2499,
+      "received_daily_rows": 2500,
       "quarantined_duplicate_dates": [
         "2020-06-22",
         "2022-04-21",
@@ -141,13 +141,13 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 783,
-      "valid_hours": 58846,
+      "valid_hours": 58870,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
     {
       "pollutant": "NO2",
-      "received_daily_rows": 2499,
+      "received_daily_rows": 2500,
       "quarantined_duplicate_dates": [
         "2020-06-22",
         "2022-04-21",
@@ -158,13 +158,13 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 850,
-      "valid_hours": 58779,
+      "valid_hours": 58803,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
     {
       "pollutant": "SO2",
-      "received_daily_rows": 2499,
+      "received_daily_rows": 2500,
       "quarantined_duplicate_dates": [
         "2020-06-22",
         "2022-04-21",
@@ -175,7 +175,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 2177,
-      "valid_hours": 57452,
+      "valid_hours": 57476,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     }
@@ -206,8 +206,8 @@
       "exactly_equal_hours": 40509
     }
   ],
-  "calendar_days": 2498,
-  "observed_target_days": 2361,
+  "calendar_days": 2499,
+  "observed_target_days": 2362,
   "missing_target_days": 137,
   "coverage_by_year": {
     "2020": {
@@ -235,13 +235,13 @@
       "complete_aqi_days": 356
     },
     "2026": {
-      "days": 306,
-      "complete_aqi_days": 295
+      "days": 307,
+      "complete_aqi_days": 296
     }
   },
   "hourly_file": "hourly_pollution_2020_latest.csv.gz",
-  "hourly_sha256": "5ecb7ac0286eafd8639de5bde0aaa0b4c0cdb8fc01b9b7738c56bcb5e4e7f32d",
-  "prepared_sha256": "373f646d59f1088ac5365e64be48f0564991afd503d515255e1b8ee2b53b9aae",
+  "hourly_sha256": "4ba8b2ab2a00716caef717b1029f7e214ea695ae848ef86b248988b465b08ac6",
+  "prepared_sha256": "ec9d600c0252f7326db714a689eff9d7f670869ae83845e9ad13bb063b1723ca",
   "sources": [
     {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FProgramInformation-InformationProgramme%2FStationsNAPS-StationsSNPA.csv",
@@ -398,32 +398,32 @@
       "bytes": 7137745
     },
     {
-      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=124&s_startDate=2020-01-01&s_endDate=2026-11-03&s_reportType=CSV",
-      "sha256": "fea88d45d0f454f8cec393e9311ca1d464f661a544e06f0d43224fe46f8750ee",
-      "downloaded_at": "2026-11-03T18:27:48.175947+00:00",
+      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=124&s_startDate=2020-01-01&s_endDate=2026-11-04&s_reportType=CSV",
+      "sha256": "5c9e258e74169e7245a5158ac51dd4dc5b7bdd9200b7ab14e8290c506852ebbd",
+      "downloaded_at": "2026-11-04T18:39:02.924524+00:00",
       "last_modified": null,
-      "bytes": 242893
+      "bytes": 242990
     },
     {
-      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=122&s_startDate=2020-01-01&s_endDate=2026-11-03&s_reportType=CSV",
-      "sha256": "8d0e8495b0631fac02b5129db4aec76b2d9df1dfe485af3537d8e426e25ce07d",
-      "downloaded_at": "2026-11-03T18:27:52.262215+00:00",
+      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=122&s_startDate=2020-01-01&s_endDate=2026-11-04&s_reportType=CSV",
+      "sha256": "80aebcaa7fb07949b7d31731599f810a1902f163df3df4c24cf72b04bd421d9c",
+      "downloaded_at": "2026-11-04T18:39:06.586564+00:00",
       "last_modified": null,
-      "bytes": 231879
+      "bytes": 231969
     },
     {
-      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=36&s_startDate=2020-01-01&s_endDate=2026-11-03&s_reportType=CSV",
-      "sha256": "11cd715f831e055b9e8dcb6fb8e1a276a147224428e87fe9288740279af78368",
-      "downloaded_at": "2026-11-03T18:27:56.178429+00:00",
+      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=36&s_startDate=2020-01-01&s_endDate=2026-11-04&s_reportType=CSV",
+      "sha256": "97fc83998a59dc8cb2f9412b1736f181bdc07cdaedfe36ec60cf821fe286dab6",
+      "downloaded_at": "2026-11-04T18:39:10.025080+00:00",
       "last_modified": null,
-      "bytes": 348630
+      "bytes": 348775
     },
     {
-      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=9&s_startDate=2020-01-01&s_endDate=2026-11-03&s_reportType=CSV",
-      "sha256": "0ba8904c540669b3974dd51998af603e0c55b56a8ee18b81390709dc68bbb4c8",
-      "downloaded_at": "2026-11-03T18:27:59.929644+00:00",
+      "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=9&s_startDate=2020-01-01&s_endDate=2026-11-04&s_reportType=CSV",
+      "sha256": "a8aab45f128b9b0dadb69a4bf9d7666fffdf2f0de3a8e8d76d8f5fdc2a7c611c",
+      "downloaded_at": "2026-11-04T18:39:13.602146+00:00",
       "last_modified": null,
-      "bytes": 279577
+      "bytes": 279707
     },
     {
       "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2020&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
@@ -462,18 +462,18 @@
     },
     {
       "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2025&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "2869ff9db0a35a3c82d39e8f28f2d4fee2ab254e404fcd60a3eda10d2485f1b4",
-      "downloaded_at": "2026-11-03T18:28:01.806065+00:00",
+      "sha256": "1e4bcb455864bba1c82b9efcaa627f1c4f327b56c7cdfd3a06470de819e9b00f",
+      "downloaded_at": "2026-11-04T18:39:15.509474+00:00",
       "last_modified": null,
       "bytes": 3356446
     },
     {
       "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2026&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "c002e209908ec25a81ee9d7d8dea82f0e2d43c103147324f3e0628489ac65cde",
-      "downloaded_at": "2026-11-03T18:28:02.889840+00:00",
+      "sha256": "bec580d7666130da2a1add74885b5719fd52940a94b7ffc648bcfb2f5a778d31",
+      "downloaded_at": "2026-11-04T18:39:16.734501+00:00",
       "last_modified": null,
-      "bytes": 2813385
+      "bytes": 2822568
     }
   ],
-  "prepared_at": "2026-11-03T18:28:03.897322+00:00"
+  "prepared_at": "2026-11-04T18:39:17.731525+00:00"
 }
