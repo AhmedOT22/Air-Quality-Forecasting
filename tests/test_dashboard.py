@@ -169,6 +169,17 @@ class DashboardUITests(unittest.TestCase):
         app.selectbox[1].select("Ozone").run()
         self.assertFalse(app.exception)
 
+    def test_prospective_performance_visuals_render(self):
+        # The bundled operational reports contain mature prospective scores.
+        bundle = local_bundle()
+        self.assertFalse(bundle["metrics"].empty)
+        with patch("dashboard_data.load_bundle", return_value=bundle):
+            app = self.app()
+        self.assertFalse(app.exception)
+        self.assertTrue(
+            any("Detailed prospective scores" in item.label for item in app.expander)
+        )
+
     def test_blocked_refresh_is_visible_without_crashing(self):
         bundle = local_bundle()
         bundle["status"]["publication_status"] = "blocked"
