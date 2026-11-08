@@ -247,7 +247,9 @@ outlook, observations, performance, method = st.tabs(
     ["Forecast outlook", "Observed history", "Performance", "About the model"]
 )
 with outlook:
-    st.subheader("The upcoming outlook")
+    st.subheader(
+        "The upcoming outlook" if state == "Current forecast" else "Published forecast snapshot"
+    )
     st.caption(
         "Solid green: retained Ridge model. Shading: experimental nominal 90% interval. Vertical line: last completed forecast origin."
     )
@@ -367,13 +369,53 @@ with performance:
             "Waiting for observed outcomes. Predictions are recorded now; genuine prospective scores appear only after their target AQI becomes available. No live accuracy is claimed yet."
         )
     else:
-        st.dataframe(
-            metrics.rename(
-                columns={"MAE": "MAE · AQI points", "RMSE": "RMSE · AQI points"}
-            ),
-            hide_index=True,
-            width="stretch",
+        st.caption(
+            "First-issued forecasts scored after the actual observation matures. "
+            "The numbers above each bar show the sample size; early results are volatile."
         )
+        fig = go.Figure()
+        for name, color in [
+            ("ridge_1", "#167466"),
+            ("ridge_forecast_weather_1", "#ca8a33"),
+        ]:
+            values = metrics.loc[
+                metrics.model.eq(name) & metrics.n.gt(0)
+            ].sort_values("horizon")
+            if values.empty:
+                continue
+            fig.add_trace(
+                go.Bar(
+                    x=values.horizon,
+                    y=values.MAE,
+                    name=MODEL_LABELS.get(name, name),
+                    marker_color=color,
+                    text=[f"n={n}" for n in values.n],
+                    textposition="outside",
+                    hovertemplate="Horizon %{x} days<br>MAE %{y:.1f} AQI points<extra>%{fullData.name}</extra>",
+                )
+            )
+        fig.update_layout(
+            barmode="group",
+            legend=dict(orientation="h", y=1.15),
+            bargap=0.3,
+        )
+        fig.update_xaxes(title="Forecast horizon (days)", dtick=1)
+        fig.update_yaxes(title="Mean absolute error · AQI points", rangemode="tozero")
+        st.plotly_chart(
+            style_chart(fig, 350), width="stretch", config={"displayModeBar": False}
+        )
+        st.caption(
+            "Lower error is better. Comparisons are descriptive, not evidence of "
+            "statistical superiority; sample sizes differ across horizons."
+        )
+        with st.expander("Detailed prospective scores and baseline comparisons"):
+            st.dataframe(
+                metrics.rename(
+                    columns={"MAE": "MAE · AQI points", "RMSE": "RMSE · AQI points"}
+                ),
+                hide_index=True,
+                width="stretch",
+            )
         rolling = bundle.get("rolling", pd.DataFrame())
         if not rolling.empty:
             with st.expander("Latest 30 scored dates per model and horizon"):
