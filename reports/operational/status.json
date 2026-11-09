@@ -1,6 +1,6 @@
 {
-  "attempted_at": "2026-11-09T07:24:07.392067+00:00",
+  "attempted_at": "2026-11-09T07:37:45.221779+00:00",
   "publication_status": "blocked",
   "contract_version": 1,
-  "error": "ValueError: A benchmark must contain one station pair, not mixed stations"
+  "error": "ValueError: Latest completed-day weather is incomplete; no new forecast issued"
 }
