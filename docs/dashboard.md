@@ -46,8 +46,9 @@ to a complete daily calendar so missing periods are visible in both charts.
 
 The dashboard uses existing reports. It does not contact the pollutant/weather APIs
 or invent missing observations, live accuracy, forecast intervals or health advice.
-The experimental nominal 90% bands achieved 79–87% retrospective coverage, which is
-visible beside the chart. Challenger forecasts remain opt-in and clearly labelled.
+The rolling conformal 90% bands covered 90–91% of outcomes per horizon in the 2026
+back-test, stated beside the chart. The About tab charts permutation importance by
+horizon from `reports/explain/importance.csv`. Challenger forecasts remain opt-in and clearly labelled.
 
 ## Verification
 

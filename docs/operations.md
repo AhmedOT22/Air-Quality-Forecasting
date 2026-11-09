@@ -66,17 +66,26 @@ and alerts explicitly say `collecting_observations`.
 
 ## Prediction intervals
 
-`uncertainty.py` fits the selected model through 2025, calibrates absolute-residual
-widths by horizon on January–June 2026 and evaluates them on July–September 2026.
-It uses the finite-sample quantile rank for nominal 90% residual intervals and
-bounds lower AQI at zero. The evaluation table is committed under `reports/uncertainty/`.
+`uncertainty.py` builds rolling split-conformal intervals. Each horizon's half-width
+is the finite-sample 90% quantile of absolute out-of-sample errors whose target dates
+fall in the 180 days before the forecast origin; lower AQI is bounded at zero.
 
-**Measured retrospective coverage is about 79–87%, below the nominal 90%.** Serial
-dependence, nonstationarity and refitting on later observations mean operational
-coverage is not guaranteed. Bounds are experimental and visibly labelled nominal;
-live first-issuance coverage is measured separately. Do not interpret them as
-validated health-warning intervals. The calibration is a fixed release artifact,
-not retuned automatically in response to prospective scores.
+The error stream comes from yearly chronological refits: 2023 is forecast by a model
+fitted through 2022, and so on to October 2026 (`reports/uncertainty/residuals.csv`).
+At each refresh `operations.py` adds the scored live errors of the primary model,
+which replace retrospective errors on the same date and horizon, and recomputes the
+widths. If a window holds fewer than 30 errors, the latest 180 known errors are used.
+
+The window was chosen on 2025 only, from 90/180/365/730 days, by a rule fixed in
+advance: every horizon within one point of 90%, then the narrowest band. The 180-day
+window covered 90.0–90.6% per horizon in 2025. **On held-out 2026 it covered
+89.8–90.8% per horizon** (`calibration.csv`, `window_selection.csv`). The previous
+fixed calibration (January–June 2026) covered only 79–87% over July–September,
+because it never saw summer errors.
+
+Serial dependence and nonstationarity mean coverage is an estimate, not a guarantee.
+Live first-issuance coverage is measured separately. Do not interpret the bands as
+validated health-warning intervals.
 
 ## Forecast-weather integration
 

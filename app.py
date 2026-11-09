@@ -104,7 +104,7 @@ def forecast_chart(primary, challenger, observed, intervals, compare):
                 fill="tonexty",
                 fillcolor="rgba(22,116,102,.13)",
                 line=dict(width=0),
-                name="Experimental interval",
+                name="90% interval",
                 hoverinfo="skip",
             )
         )
@@ -255,15 +255,18 @@ with outlook:
         else "Published forecast snapshot"
     )
     st.caption(
-        "Solid green: retained Ridge model. Shading: experimental nominal 90% interval. Vertical line: last completed forecast origin."
+        "Solid green: retained Ridge model. Shading: rolling conformal 90% interval. Vertical line: last completed forecast origin."
     )
     st.plotly_chart(
         forecast_chart(primary, challenger, observed, show_interval, show_challenger),
         width="stretch",
         config={"displayModeBar": False},
     )
+    coverage = pd.read_csv(ROOT / "reports/uncertainty/calibration.csv")
     st.info(
-        "Uncertainty is experimental: the nominal 90% intervals covered 79–87% of observations in the later retrospective evaluation. They do not guarantee 90% live coverage."
+        "Shaded band: rolling conformal 90% interval, set each run from the last 180 days of "
+        f"forecast errors. In 2026 back-testing it covered {coverage.observed_coverage.min():.0%}–"
+        f"{coverage.observed_coverage.max():.0%} of outcomes by horizon; live coverage is not guaranteed."
     )
     left, right = st.columns([2, 1])
     with left:
@@ -489,6 +492,45 @@ with method:
     st.markdown(
         "**01 · Observe**  NAPS Toronto West history from 2020, extended with Ontario observations and ECCC Pearson weather.\n\n**02 · Prepare**  Fixed-EST hourly alignment, strict coverage, all four pollutants required, no imputed AQI targets.\n\n**03 · Forecast**  Ridge regression, alpha 1, one model per horizon. Available AQI lags, seasonal terms and completed-day weather.\n\n**04 · Verify**  First-issued forecasts are preserved and later compared with observed AQI. Stale or incomplete refreshes block new issuance."
     )
+    st.markdown("**What drives the forecast**")
+    drivers = pd.read_csv(ROOT / "reports/explain/importance.csv")
+    lead = st.select_slider(
+        "Forecast horizon (days ahead)", options=list(range(1, 8)), value=1
+    )
+    view = drivers.loc[drivers.horizon.eq(lead)].assign(
+        MAE_increase=lambda d: d.MAE_increase.clip(lower=0)
+    )
+    view = view.sort_values("MAE_increase")
+    fig = go.Figure(
+        go.Bar(
+            x=view.MAE_increase,
+            y=view.label,
+            orientation="h",
+            marker_color="#167466",
+            text=[f"+{v:.2f}" if v >= 0.05 else "" for v in view.MAE_increase],
+            textposition="outside",
+            hovertemplate="%{y}<br>Error increase when shuffled: +%{x:.2f} AQI points<extra></extra>",
+        )
+    )
+    fig.update_xaxes(
+        title="Increase in mean absolute error when the input is shuffled · AQI points",
+        rangemode="tozero",
+    )
+    st.plotly_chart(
+        style_chart(fig, 380), width="stretch", config={"displayModeBar": False}
+    )
+    st.caption(
+        f"Permutation importance on 2025 for a model fitted through 2024 (baseline error {view.baseline_MAE.iloc[0]:.1f} AQI points). "
+        "Longer bars mean the forecast leans harder on that input. AQI lags are correlated, so each one alone "
+        "understates how much the model relies on recent AQI as a whole. This shows reliance, not cause."
+    )
+    with st.expander("Importance by horizon · table"):
+        st.dataframe(
+            drivers.pivot(index="label", columns="horizon", values="MAE_increase")
+            .round(2)
+            .rename_axis(index="Input", columns="Horizon (days)"),
+            width="stretch",
+        )
     st.warning(
         "This is a four-pollutant station reconstruction, not an official Toronto city AQI, Canadian AQHI, or health advisory. Recent observations are provisional."
     )

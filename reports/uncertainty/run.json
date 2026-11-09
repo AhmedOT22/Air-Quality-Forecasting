@@ -14,13 +14,14 @@
     "family": "ridge",
     "alpha": 1.0
   },
-  "fit_end": "2025-12-31",
-  "calibration": "2026-01-01/2026-06-30",
-  "evaluation": "2026-07-01/2026-09-30",
-  "method": "Finite-sample absolute residual quantile by horizon; bounded below at zero",
+  "method": "Rolling split conformal: finite-sample 90% quantile of absolute out-of-sample errors in the trailing 180 days, per horizon; lower bound at zero",
+  "residual_stream": "Yearly chronological refits 2023-2026 (fit through the prior year)",
+  "window_selection": "2025 only; candidates [90, 180, 365, 730] days",
+  "held_out_evaluation": "2026-01-01/2026-10-30",
+  "operational": "Each refresh recomputes widths from the trailing window, adding scored live forecasts to the retrospective stream",
   "limitations": [
-    "Serial dependence and nonstationarity invalidate an unconditional coverage guarantee",
-    "Operational model is refit on later data; calibration widths are estimates, not guaranteed 90% coverage",
-    "2026 interval evaluation is retrospective; report live coverage separately"
+    "Serial dependence and nonstationarity rule out a guaranteed coverage; the window adapts, it does not certify",
+    "Retrospective errors come from yearly refits, while the live model is refit each run",
+    "Live interval coverage is reported separately once forecasts are scored"
   ]
 }

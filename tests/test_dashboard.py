@@ -181,7 +181,7 @@ class DashboardUITests(unittest.TestCase):
         self.assertTrue(
             any("Waiting for observed outcomes" in info.value for info in app.info)
         )
-        self.assertTrue(any("79–87%" in info.value for info in app.info))
+        self.assertTrue(any("rolling conformal 90%" in i.value for i in app.info))
         app.selectbox[0].select("All data since 2020").run()
         app.selectbox[1].select("Ozone").run()
         self.assertFalse(app.exception)
@@ -205,6 +205,12 @@ class DashboardUITests(unittest.TestCase):
         self.assertTrue(
             any("Detailed prospective scores" in e.label for e in app.expander)
         )
+
+    def test_model_drivers_chart_switches_horizon(self):
+        app = self.app()
+        self.assertTrue(any("Importance by horizon" in e.label for e in app.expander))
+        app.select_slider[0].set_value(7).run()
+        self.assertFalse(app.exception)
 
     def test_blocked_refresh_is_visible_without_crashing(self):
         bundle = local_bundle()

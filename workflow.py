@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
 from aqi import category
 from etl_contract import validate
 from features import make_features, seasonal_lag
@@ -20,6 +20,7 @@ CANDIDATES = [
     dict(name="ridge_10", family="ridge", alpha=10.0),
     dict(name="forest_lags_5", family="forest_lags", leaf=5),
     dict(name="forest_weather_5", family="forest_weather", leaf=5),
+    dict(name="boosting_20", family="boosting", leaf=20),
     dict(name="persistence", family="persistence"),
     dict(name="weekly", family="weekly"),
 ]
@@ -30,6 +31,17 @@ def estimator(config):
     family = config["family"]
     if family == "autoregression":
         return make_pipeline(StandardScaler(), LinearRegression())
+    if family == "boosting":
+        # Shallow, slow-learning trees with an MAE loss; missing weather is handled natively.
+        return HistGradientBoostingRegressor(
+            loss="absolute_error",
+            learning_rate=0.03,
+            max_iter=300,
+            max_leaf_nodes=7,
+            min_samples_leaf=config["leaf"],
+            l2_regularization=1.0,
+            random_state=42,
+        )
     preprocessing = [
         SimpleImputer(strategy="median", add_indicator=True, keep_empty_features=True)
     ]
@@ -133,6 +145,11 @@ def tuning_grid(winner):
             dict(name=f"ridge_{alpha:g}", family=family, alpha=alpha)
             for alpha in (1.0, 10.0, 100.0)
         ]
+    if family == "boosting":
+        return [
+            dict(name=f"boosting_{leaf}", family=family, leaf=leaf)
+            for leaf in (10, 20, 40)
+        ]
     if family.startswith("forest"):
         return [
             dict(name=f"{family}_{leaf}", family=family, leaf=leaf)
@@ -175,6 +192,22 @@ def forward(frame, config):
     return pd.DataFrame(rows)
 
 
+def challenger(frame, selected):
+    """Report-only: tune boosting on 2024, then score it beside the selected model on 2025.
+
+    Selection never reads this table; it documents how the strongest nonlinear
+    candidate compares on the held-out year.
+    """
+    boosting = next(c for c in CANDIDATES if c["family"] == "boosting")
+    if selected["family"] == "boosting":
+        return pd.DataFrame()
+    grid = tuning_grid(boosting)
+    _, tuning = evaluate(frame, "2023-12-31", "2024-12-31", grid)
+    tuned = choose(tuning, grid)
+    _, test = evaluate(frame, "2024-12-31", "2025-12-31", [selected, tuned])
+    return test[["model", "horizon", "n", "MAE", "RMSE", "MAE_skill"]]
+
+
 def run(output="reports/workflow"):
     frame, lock = validate()
     output = Path(output)
@@ -215,6 +248,7 @@ def run(output="reports/workflow"):
             .reset_index()
         )
         diagnostic.to_csv(output / f"test_errors_by_{field}.csv", index=False)
+    challenger(frame, selected).to_csv(output / "boosting_challenger.csv", index=False)
     forecast = forward(frame, selected)
     forecast.to_csv(output / "forecast.csv", index=False)
     metadata = {
@@ -227,6 +261,7 @@ def run(output="reports/workflow"):
         "selection_rule": "Lowest mean MAE with equal weight per fold and horizon; selection excludes 2025",
         "horizons": list(HORIZONS),
         "forest_trees": TREES,
+        "boosting": "HistGradientBoosting, absolute-error loss, learning rate 0.03, 300 iterations, 7 leaves",
         "seed": 42,
         "latest_completed_origin": str(frame.index[-1].date()),
         "forecast_status": "Forecast after the latest completed observation day; freshness depends on input refresh",

@@ -25,6 +25,21 @@ MAE is in AQI points on 306–314 matched dates per horizon. "Persistence" repea
 latest known AQI — the standard baseline a forecast has to beat. Ridge beats it at every
 horizon from 1 to 7 days. Full tables: [`reports/workflow/`](reports/workflow/).
 
+**Gradient boosting** competed as a candidate and lost the 2022–23 comparison (MAE 12.80
+vs 12.48), so Ridge stays. On 2025, a tuned boosting model would have scored slightly
+better on average (11.76 vs 11.93), winning at 6 of 7 horizons, but the rule picks models
+on earlier years only, so that is reported rather than acted on
+([`boosting_challenger.csv`](reports/workflow/boosting_challenger.csv)).
+
+**What drives a forecast.** Permutation importance on 2025 shows the latest AQI and wind
+speed dominate 1-day forecasts, while the 7-day mean and time of year take over from
+3 days out ([`reports/explain/`](reports/explain/), chart on the dashboard).
+
+**Prediction intervals.** Each forecast carries a rolling conformal 90% interval, set
+from the last 180 days of out-of-sample errors. Chosen on 2025 and checked on 2026, it
+covered 89.8–90.8% of outcomes per horizon, up from 79–87% with the previous fixed
+calibration ([`reports/uncertainty/`](reports/uncertainty/)).
+
 ## How it works
 
 ```text
@@ -49,15 +64,15 @@ Federal (NAPS) + Ontario pollution data, ECCC weather
   forecast time, including the one-day delay before ozone-based AQI is final. Scaling
   and imputation are fitted on training data only, and tests assert that changing
   future values never changes a past prediction.
-- **Baseline-driven model selection.** Linear autoregression, Ridge and random forests
-  were compared against persistence and weekly-repeat baselines on identical dates,
+- **Baseline-driven model selection.** Linear autoregression, Ridge, random forests and
+  gradient boosting were compared against persistence and weekly-repeat baselines on identical dates,
   using expanding yearly folds rather than random splits.
 - **Reproducible data.** A versioned ETL contract, SHA-256 checksums and source
   manifests lock the research snapshot. Missing AQI is never imputed.
 - **Production behaviour.** Each forecast is recorded once and never overwritten,
   stale inputs block publication instead of silently reusing old data, and every
   forecast is tagged with the model version that produced it.
-- **Tested.** 55 unit and integration tests cover AQI calculations, leakage,
+- **Tested.** 65 unit and integration tests cover AQI calculations, leakage,
   scheduling and the dashboard; CI also re-executes the analysis notebook.
 
 ## Project layout
@@ -70,7 +85,9 @@ Federal (NAPS) + Ontario pollution data, ECCC weather
 | `features.py`, `workflow.py` | Leakage-aware features, model selection and evaluation |
 | `operations.py` | Scheduled refresh, forecast issuance and scoring |
 | `app.py`, `dashboard_data.py` | Streamlit dashboard |
-| `weather_model.py`, `uncertainty.py` | Experimental: weather-forecast challenger, intervals |
+| `uncertainty.py` | Rolling conformal prediction intervals |
+| `explain.py` | Permutation importance: what drives each horizon's forecast |
+| `weather_model.py` | Experimental weather-forecast challenger |
 
 ## Run locally
 
@@ -96,8 +113,9 @@ For the notebook, install `requirements-dev.txt` and run `jupyter lab AirQuality
   from four pollutants (PM2.5, O3, NO2, SO2). It is not Canada's AQHI or a health advisory.
 - **Live track record is still building.** The 2025 numbers above are a historical
   test. Live accuracy appears on the dashboard once each horizon has 30 scored forecasts.
-- **Experimental extras.** The nominal 90% intervals reached only 79–87% coverage
-  historically, and the weather-forecast challenger is monitored separately and never
+- **Intervals are calibrated, not guaranteed.** Errors are serially dependent and
+  conditions shift, so 90% coverage is a back-tested estimate; live coverage is scored
+  separately. The weather-forecast challenger is monitored on its own and never
   replaces the main model automatically.
 
 ## Documentation

@@ -416,7 +416,13 @@ def run(refresh=True, now=None, reports=REPORTS):
                     ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
                 ).strip()
             )
-            calibration = pd.read_csv(ROOT / "reports/uncertainty/calibration.csv")
+            # Rolling conformal widths: trailing errors known at this origin, with
+            # scored live forecasts taking over from the retrospective stream.
+            from uncertainty import load_residuals, trailing_widths
+
+            calibration = trailing_widths(
+                load_residuals(reports, config["name"], ROOT), frame.index[-1]
+            )
             history, new = issue(
                 frame, config, lock, now_arg, history, revision, intervals=calibration
             )

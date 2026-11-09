@@ -36,6 +36,7 @@
     7
   ],
   "forest_trees": 100,
+  "boosting": "HistGradientBoosting, absolute-error loss, learning rate 0.03, 300 iterations, 7 leaves",
   "seed": 42,
   "latest_completed_origin": "2026-10-30",
   "forecast_status": "Forecast after the latest completed observation day; freshness depends on input refresh",
