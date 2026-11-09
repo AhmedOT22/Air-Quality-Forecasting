@@ -54,6 +54,23 @@ class DashboardDataTests(unittest.TestCase):
         self.assertEqual(bundle["source"], "Bundled snapshot")
         self.assertTrue(any("bundled snapshot" in w for w in bundle["warnings"]))
 
+    def test_published_reports_prefer_data_branch_then_main(self):
+        import dashboard_data
+
+        requested = []
+
+        def fake_request(url):
+            requested.append(url)
+            if url.endswith("/heads/data"):
+                raise OSError("no data branch yet")
+            raise OSError("stop after branch resolution")
+
+        with patch("dashboard_data.request", side_effect=fake_request):
+            with self.assertRaises(OSError):
+                dashboard_data.published_bundle()
+        self.assertTrue(requested[0].endswith("/git/ref/heads/data"))
+        self.assertTrue(requested[1].endswith("/git/ref/heads/main"))
+
     def test_latest_model_version_is_displayed_without_merging_issuances(self):
         bundle = local_bundle()
         old = bundle["forecast"].copy()

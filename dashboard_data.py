@@ -12,6 +12,9 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 REPOSITORY = "AhmedOT22/Air-Quality-Forecasting"
+# The scheduled refresh publishes the operational ledger to this branch, keeping
+# automated commits out of main. main is the fallback before the branch exists.
+PUBLISHED_BRANCHES = ("data", "main")
 FILES = {
     "status": "status.json",
     "forecast": "latest_forecast.csv",
@@ -117,9 +120,17 @@ def local_bundle(root=ROOT):
 
 
 def published_bundle():
-    ref = json.loads(
-        request(f"https://api.github.com/repos/{REPOSITORY}/git/ref/heads/main")
-    )
+    for branch in PUBLISHED_BRANCHES:
+        try:
+            ref = json.loads(
+                request(
+                    f"https://api.github.com/repos/{REPOSITORY}/git/ref/heads/{branch}"
+                )
+            )
+            break
+        except OSError:
+            if branch == PUBLISHED_BRANCHES[-1]:
+                raise
     sha = ref["object"]["sha"]
 
     def read(item):

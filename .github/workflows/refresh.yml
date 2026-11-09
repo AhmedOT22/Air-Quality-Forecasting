@@ -43,6 +43,12 @@ jobs:
           key: raw-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: raw-v1-${{ runner.os }}-
       - run: python -m unittest discover -s tests -q
+      - name: Restore the operational ledger from the data branch
+        run: |
+          if git ls-remote --exit-code --heads origin data > /dev/null; then
+            git fetch --depth=1 origin data
+            git checkout FETCH_HEAD -- reports/operational
+          fi
       - name: Refresh, check freshness, issue and score
         run: python operations.py
       - name: Preserve input snapshot and diagnostics
@@ -57,14 +63,25 @@ jobs:
             reports/uncertainty/
           retention-days: 90
           if-no-files-found: warn
-      - name: Persist forecast history and run status
+      - name: Publish forecast history and run status to the data branch
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/operational/
-          if ! git diff --cached --quiet; then
-            git commit -m "Update forecasts and observed performance"
-            git pull --rebase origin main
-            git push origin HEAD:main
+          ledger="$RUNNER_TEMP/ledger"
+          if git ls-remote --exit-code --heads origin data > /dev/null; then
+            git fetch --depth=1 origin data
+            git worktree add --detach "$ledger" FETCH_HEAD
+          else
+            git worktree add --detach "$ledger"
+            git -C "$ledger" checkout --orphan data
+            git -C "$ledger" rm -rqf .
+          fi
+          rm -rf "$ledger/reports/operational"
+          mkdir -p "$ledger/reports"
+          cp -r reports/operational "$ledger/reports/"
+          git -C "$ledger" add -A reports/operational
+          if ! git -C "$ledger" diff --cached --quiet; then
+            git -C "$ledger" commit -m "Update forecasts and observed performance"
+            git -C "$ledger" push origin HEAD:refs/heads/data
           fi

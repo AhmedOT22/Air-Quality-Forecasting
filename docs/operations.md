@@ -19,8 +19,8 @@ No API keys are needed for the currently configured public sources.
 5. Refit the approved model and generate seven daily predictions. Missing/stale
    inputs block issuance; no quiet fallback to an earlier origin occurs.
 6. Archive the first issuance per origin/model version. Reruns cannot rewrite it.
-7. Commit small reports/history to main and retain full input snapshots as workflow
-   artifacts for 90 days. Raw download caching reduces repeated national downloads.
+7. Commit small reports/history to the `data` branch (keeping automated commits out
+   of `main`) and retain full input snapshots as workflow artifacts for 90 days. Raw download caching reduces repeated national downloads.
 
 `status.json` is authoritative for freshness and success. A failed refresh records
 `publication_status: blocked`, preserves the prior forecast as historical output,
@@ -108,7 +108,10 @@ No provider concentration/AQHI forecasts are substituted for this project's AQI 
 
 ## Outputs
 
-- `reports/operational/latest_forecast.csv`: latest primary and challenger predictions.
+The live ledger lives on the [`data` branch](https://github.com/AhmedOT22/Air-Quality-Forecasting/tree/data/reports/operational);
+`reports/operational/` on `main` is a snapshot used for offline dashboard tests and the notebook.
+
+- `latest_forecast.csv`: latest primary and challenger predictions.
 - `forecast_history.csv`, `observation_history.csv`: persistent prediction/truth history.
 - `scores.csv`, `metrics.csv`, `rolling_metrics.csv`, `alerts.json`: prospective diagnostics.
 - `status.json`, `latest_manifest.json`, `weather_status.json`: freshness and provenance.
