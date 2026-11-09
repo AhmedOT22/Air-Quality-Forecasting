@@ -1,6 +1,12 @@
 {
-  "attempted_at": "2026-11-09T07:39:39.031164+00:00",
-  "publication_status": "blocked",
+  "attempted_at": "2026-11-09T08:20:51.791332+00:00",
+  "publication_status": "current",
   "contract_version": 1,
-  "error": "ValueError: Latest completed-day weather is incomplete; no new forecast issued"
+  "origin": "2026-11-08",
+  "pollution_age_hours": 0.35296735277777774,
+  "issued_rows": 14,
+  "prospective_scores": 54,
+  "weather_status": "issued_experimental_challenger",
+  "input_sha256": "1d6ba19aa0fce30564f64c9212599e34f9f71246d9da321622dcae296f063541",
+  "note": "First issuance retained; same-day forecasts excluded from prospective metrics; unverified truth can be revised"
 }
