@@ -17,7 +17,7 @@ on:
       - forecast_weather.py
       - weather_model.py
       - uncertainty.py
-      - requirements-tested.txt
+      - requirements.txt
       - reports/workflow/run.json
       - reports/uncertainty/**
       - .github/workflows/refresh.yml
@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
-      - run: python -m pip install -r requirements-tested.txt
+      - run: python -m pip install -r requirements.txt
       - uses: actions/cache@v4
         with:
           path: data/raw

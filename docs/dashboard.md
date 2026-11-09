@@ -4,13 +4,12 @@ The new app entry point is `app.py`. It is read-only: opening it or pressing
 Refresh does not retrain models, change ETL snapshots, or write monitoring history.
 
 ```bash
-python -m pip install -r requirements-app.txt
+python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-`requirements-app.txt` pins the tested UI dependencies alongside the existing tested
-modelling environment. `requirements.txt` delegates to those same pins so a normal
-Streamlit Community Cloud deployment uses the CI versions. Select this repository,
+`requirements.txt` pins both the modelling and UI dependencies, so a Streamlit
+Community Cloud deployment uses exactly the CI versions. Select this repository,
 branch `main`, entry point `app.py`. No API keys or secrets are required. Creating the
 app source and passing tests does not itself create a hosted Community Cloud URL.
 
@@ -54,9 +53,8 @@ visible beside the chart. Challenger forecasts remain opt-in and clearly labelle
 
 `tests/test_dashboard.py` checks data freshness, blocked status, remote fallback,
 version selection and real Streamlit interactions (horizon, interval/challenger
-controls, history range and pollutant). UI tests run in a separate CI job with
-`requirements-app.txt`; core-only environments skip UI integration tests while still
-running data-access tests. Tests use `AQI_DASHBOARD_OFFLINE=1` and no live requests.
+controls, history range and pollutant). Environments without Streamlit skip the UI
+integration tests while still running data-access tests. Tests use `AQI_DASHBOARD_OFFLINE=1` and no live requests.
 
 The app also passes a local-only Streamlit startup and HTTP health check. A browser
 screenshot was not verified in this workspace; rendered elements and widget behavior

@@ -1,2 +1,6 @@
--r requirements-app.txt
+# Development extras: linting and notebook execution.
+-r requirements.txt
 ruff==0.14.3
+jupyterlab>=4.3,<5
+ipykernel>=6.29,<8
+nbclient>=0.10,<0.11

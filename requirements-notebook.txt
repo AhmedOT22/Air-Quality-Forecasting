@@ -1,5 +1,0 @@
-# Current reproducible notebook; legacy Prophet/XGBoost exploration is archived.
--r requirements-tested.txt
-jupyterlab>=4.3,<5
-ipykernel>=6.29,<8
-nbclient>=0.10,<0.11

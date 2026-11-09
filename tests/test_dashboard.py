@@ -128,7 +128,7 @@ class DashboardDataTests(unittest.TestCase):
 
 
 @unittest.skipIf(
-    AppTest is None, "Install requirements-app.txt for Streamlit integration tests"
+    AppTest is None, "Install requirements.txt for Streamlit integration tests"
 )
 class DashboardUITests(unittest.TestCase):
     def setUp(self):
