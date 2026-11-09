@@ -22,9 +22,13 @@ No API keys are needed for the currently configured public sources.
 7. Commit small reports/history to the `data` branch (keeping automated commits out
    of `main`) and retain full input snapshots as workflow artifacts for 90 days. Raw download caching reduces repeated national downloads.
 
-`status.json` is authoritative for freshness and success. A failed refresh records
-`publication_status: blocked`, preserves the prior forecast as historical output,
-and fails the workflow visibly. The schedule does not retune models or automatically
+`status.json` is authoritative for freshness and success. A refresh that cannot
+publish records `publication_status: blocked` with the reason and preserves the prior
+forecast as historical output. Inputs that are simply not ready yet (for example,
+ECCC has not published yesterday's weather, or the origin is stale) raise
+`PublicationBlocked`: that is the designed safe outcome, so the job finishes green
+with a "No forecast issued" notice in the run summary. Any other error, such as a
+failed download, invalid data or a code fault, still fails the workflow visibly. The schedule does not retune models or automatically
 promote a challenger. Publication is restricted to `reports/operational/`; frozen
 benchmark snapshots and their lock are not renewed by the scheduled job.
 

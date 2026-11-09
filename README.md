@@ -157,9 +157,13 @@ headless, as CI does). Live refreshes run in GitHub Actions; see
 [Source comparison](docs/source_comparison.md) · [Operations](docs/operations.md) ·
 [Dashboard](docs/dashboard.md)
 
-**Data:** Environment and Climate Change Canada (NAPS, Meteorological Service of Canada)
-and the Government of Ontario, under the
-[Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada).
-Forecast weather from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0).
+**Data:** pollution (NAPS) and weather data from Environment and Climate Change Canada,
+under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada);
+2025-onward pollution data from the Government of Ontario
+([Air Quality Ontario](https://www.airqualityontario.com/), subject to its
+[terms and disclaimer](https://www.airqualityontario.com/science/disclaimer.php));
+forecast weather from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0).
+
+**Licence:** code under the [MIT License](LICENSE); data remains under its sources' terms.
 
 Developed by [Ahmed Ouazzani](https://github.com/AhmedOT22).

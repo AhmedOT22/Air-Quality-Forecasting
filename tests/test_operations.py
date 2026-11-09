@@ -4,7 +4,15 @@ import unittest
 import numpy as np
 import pandas as pd
 from tests.test_features import fixture
-from operations import HISTORY_COLUMNS, OBS_COLUMNS, freshness, issue, observe, score
+from operations import (
+    HISTORY_COLUMNS,
+    OBS_COLUMNS,
+    PublicationBlocked,
+    freshness,
+    issue,
+    observe,
+    score,
+)
 
 CONFIG = {"name": "persistence", "family": "persistence"}
 
@@ -61,7 +69,8 @@ class OperationsTests(unittest.TestCase):
         cases.append((missing, manifest))
         cases.append((self.frame, {"latest_pollution_hour_est": str(self.origin)}))
         for frame, metadata in cases:
-            with self.assertRaises(ValueError):
+            # A designed block, distinguishable from faults so the job can stay green.
+            with self.assertRaises(PublicationBlocked):
                 freshness(frame, metadata, self.now)
 
     def test_no_score_until_observation_matures_and_no_historical_performance(self):
@@ -194,3 +203,20 @@ class OperationsTests(unittest.TestCase):
             status = json.loads((path / "status.json").read_text())
             self.assertEqual(status["publication_status"], "blocked")
             self.assertIn("changed release", status["error"])
+
+    def test_unready_inputs_block_as_designed_but_faults_stay_distinct(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from operations import run
+
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            # The bundled snapshot ends in October 2026, so a much later clock
+            # makes its inputs stale: a designed block, not a fault.
+            with self.assertRaises(PublicationBlocked):
+                run(refresh=False, now="2027-03-01T15:00:00+00:00", reports=path)
+            status = json.loads((path / "status.json").read_text())
+            self.assertEqual(status["publication_status"], "blocked")
+            self.assertIn("Stale daily input", status["error"])
+        self.assertFalse(issubclass(OSError, PublicationBlocked))

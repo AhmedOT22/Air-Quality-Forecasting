@@ -41,6 +41,14 @@ HISTORY_COLUMNS = [
 OBS_COLUMNS = ["Date", "AQI", "first_seen_at", "input_sha256", "verification_status"]
 
 
+class PublicationBlocked(ValueError):
+    """Inputs are not ready (e.g. weather not yet published); no forecast is issued.
+
+    This is the designed safe outcome, not a fault: the status file records the
+    reason and the scheduled job finishes successfully. Other errors still fail.
+    """
+
+
 def utc(value=None):
     stamp = pd.Timestamp(value or datetime.now(timezone.utc))
     if stamp.tzinfo is None:
@@ -68,23 +76,23 @@ def freshness(frame, manifest, now):
     local_now = utc(now).tz_convert(EST).tz_localize(None)
     expected_origin = local_now.normalize() - pd.Timedelta(days=1)
     if frame.index[-1] != expected_origin:
-        raise ValueError(
+        raise PublicationBlocked(
             f"Stale daily input: expected completed origin {expected_origin.date()}, got {frame.index[-1].date()}"
         )
     latest = pd.Timestamp(manifest["latest_pollution_hour_est"])
     age = (local_now - latest - pd.Timedelta(hours=1)).total_seconds() / 3600
     if age < -1 or age > 6:
-        raise ValueError(
+        raise PublicationBlocked(
             f"Pollution readings are stale or future-dated: age {age:.1f} hours"
         )
     weather = ["temperature_c", "humidity_pct", "wind_speed_kmh", "pressure_kpa"]
     if frame[weather].iloc[-1].isna().any():
-        raise ValueError(
+        raise PublicationBlocked(
             "Latest completed-day weather is incomplete; no new forecast issued"
         )
     _, _, eligible = make_features(frame, 1)
     if not eligible.iloc[-1]:
-        raise ValueError(
+        raise PublicationBlocked(
             "Latest origin lacks required AQI history; no stale-origin fallback"
         )
     return {"origin": str(expected_origin.date()), "pollution_age_hours": age}
@@ -516,4 +524,8 @@ if __name__ == "__main__":
         help="Use frozen inputs for a freshness-checked smoke run",
     )
     args = parser.parse_args()
-    print(json.dumps(run(refresh=not args.snapshot), indent=2))
+    try:
+        print(json.dumps(run(refresh=not args.snapshot), indent=2))
+    except PublicationBlocked as blocked:
+        # Shown as a notice in the GitHub Actions run summary; the job stays green.
+        print(f"::notice title=No forecast issued::{blocked}")
