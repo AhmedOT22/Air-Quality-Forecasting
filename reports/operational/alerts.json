@@ -1,0 +1,6 @@
+{
+  "status": "monitoring",
+  "minimum_samples": 20,
+  "alerts": [],
+  "note": "Diagnostic thresholds, not statistical significance; overlapping forecasts are dependent"
+}
