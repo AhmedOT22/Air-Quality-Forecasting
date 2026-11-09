@@ -42,7 +42,7 @@ class ForecastAdditionsTests(unittest.TestCase):
             daily(data)
 
     def test_archived_weather_joins_target_day_and_matching_horizon(self):
-        frame = fixture().rename(columns={"PM25": "AQI"})
+        frame = fixture()
         rows = []
         for h in [1, 7]:
             for date in frame.index:

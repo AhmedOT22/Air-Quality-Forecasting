@@ -118,7 +118,7 @@ class AQITests(unittest.TestCase):
         self.assertTrue(np.isnan(result.AQI.iloc[-1]))
 
     def test_aqi_current_day_is_not_used_before_ozone_is_finalized(self):
-        frame = fixture().rename(columns={"PM25": "AQI"})
+        frame = fixture()
         f, _, _ = make_features(frame, 1)
         self.assertEqual(f.aqi_lag_0.iloc[20], frame.AQI.iloc[19])
         changed = frame.copy()

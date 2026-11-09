@@ -72,7 +72,7 @@ Federal (NAPS) + Ontario pollution data, ECCC weather
 - **Production behaviour.** Each forecast is recorded once and never overwritten,
   stale inputs block publication instead of silently reusing old data, and every
   forecast is tagged with the model version that produced it.
-- **Tested.** 65 unit and integration tests cover AQI calculations, leakage,
+- **Tested.** 66 unit and integration tests cover AQI calculations, leakage,
   scheduling and the dashboard; CI also re-executes the analysis notebook.
 
 ## Project layout

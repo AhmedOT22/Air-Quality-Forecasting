@@ -31,7 +31,7 @@ class BoostingTests(unittest.TestCase):
     def test_boosting_is_a_tunable_candidate_that_respects_the_boundary(self):
         boosting = next(c for c in CANDIDATES if c["family"] == "boosting")
         self.assertEqual([c["leaf"] for c in tuning_grid(boosting)], [10, 20, 40])
-        frame = fixture().rename(columns={"PM25": "AQI"})
+        frame = fixture()
         frame.loc[frame.index[50:60], "temperature_c"] = np.nan  # native NaN handling
         boundary = frame.index[100]
         changed = frame.copy()
@@ -101,7 +101,7 @@ class ExplanationTests(unittest.TestCase):
         self.assertEqual(len(grouped), 3)
 
     def test_importance_flags_the_input_the_model_uses(self):
-        frame = fixture().rename(columns={"PM25": "AQI"})
+        frame = fixture()
         frame.index = pd.date_range("2024-09-01", periods=len(frame), name="Date")
         with unittest.mock.patch("explain.FIT_END", "2024-12-15"):
             rows = pd.DataFrame(

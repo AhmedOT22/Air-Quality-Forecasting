@@ -15,7 +15,7 @@ from workflow import fit
 def fixture():
     n = 160
     frame = pd.DataFrame(
-        {"PM25": 12 + np.sin(np.arange(n) / 4) * 5},
+        {"AQI": 12 + np.sin(np.arange(n) / 4) * 5},
         index=pd.date_range("2023-10-01", periods=n, name="Date"),
     )
     for i, name in enumerate(WEATHER_FIELDS):
@@ -30,15 +30,16 @@ class ForecastTests(unittest.TestCase):
         frame = fixture()
         f, _, _ = make_features(frame, 7)
         origin = frame.index[20]
-        self.assertEqual(f.loc[origin, "pm25_lag_0"], frame.PM25.iloc[20])
-        self.assertEqual(f.loc[origin, "pm25_lag_13"], frame.PM25.iloc[7])
+        # AQI is available one day late: lag 0 is the day before the origin.
+        self.assertEqual(f.loc[origin, "aqi_lag_0"], frame.AQI.iloc[19])
+        self.assertEqual(f.loc[origin, "aqi_lag_13"], frame.AQI.iloc[6])
         self.assertEqual(f.loc[origin, "temperature_c"], frame.temperature_c.iloc[20])
         self.assertAlmostEqual(
-            f.loc[origin, "pm25_mean_7d"], frame.PM25.iloc[14:21].mean()
+            f.loc[origin, "aqi_mean_7d"], frame.AQI.iloc[13:20].mean()
         )
 
     def test_imputation_fitted_only_on_training_features(self):
-        frame = fixture().rename(columns={"PM25": "AQI"})
+        frame = fixture()
         end = frame.index[-21]
         frame.loc[frame.index > end, "temperature_c"] = 10000
         config = {"name": "forest_weather_5", "family": "forest_weather", "leaf": 5}

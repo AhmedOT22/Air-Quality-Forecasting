@@ -11,7 +11,8 @@ of ozone windows. Every training label and predictor obeys that boundary. Imputa
 and scaling are fitted within the training window; missing AQI is never imputed.
 
 Candidates are direct linear autoregression on AQI history, Ridge with weather,
-index-only random forest, forest with weather, persistence and weekly naive. The
+index-only random forest, forest with weather, gradient boosting, persistence and
+weekly naive. The
 linear autoregression is a classical lag regression, not a claim to have run ARIMA,
 SARIMA, ETS or Prophet. This bounded candidate set does not establish a globally
 optimal model. Forests use 100 trees, minimum leaf size 5 and seed 42.

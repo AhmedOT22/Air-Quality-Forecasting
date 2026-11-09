@@ -10,7 +10,7 @@ CONFIG = {"name": "persistence", "family": "persistence"}
 
 
 def example():
-    f = fixture().rename(columns={"PM25": "AQI"})
+    f = fixture()
     f.index = pd.date_range("2026-05-25", periods=len(f), name="Date")
     f["verification_status"] = "includes_unverified_observations"
     return f

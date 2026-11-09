@@ -16,7 +16,7 @@ from workflow import choose, evaluate, forward, tuning_grid
 
 class WorkflowTests(unittest.TestCase):
     def frame(self):
-        frame = fixture().rename(columns={"PM25": "AQI"})
+        frame = fixture()
         return frame
 
     def test_post_boundary_values_do_not_change_first_prediction_or_training_fit(self):
