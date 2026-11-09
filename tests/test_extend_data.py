@@ -8,7 +8,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from extend_data import concatenate_hourly, read_ontario
+from extend_data import attach_weather, concatenate_hourly, read_ontario
+from features import validate_frame
 from features import load_data
 
 
@@ -113,3 +114,26 @@ class ExtensionTests(unittest.TestCase):
             for date in info["quarantined_duplicate_dates"]:
                 if date >= "2025-01-01":
                     self.assertTrue(hourly.loc[date, info["pollutant"]].isna().all())
+
+
+class WeatherJoinTests(unittest.TestCase):
+    def test_unpublished_latest_weather_keeps_station_and_fails_freshness(self):
+        from data_sources import WEATHER_FIELDS
+        from operations import freshness
+
+        dates = pd.date_range("2026-01-01", periods=70, name="Date")
+        daily = pd.DataFrame({"AQI": 30.0}, index=dates)
+        weather = pd.DataFrame(
+            {name: 1.0 for name in WEATHER_FIELDS}, index=dates[:-1]
+        ).assign(climate_station_id="6158731")
+        joined = attach_weather(daily, weather)
+        self.assertEqual(joined.climate_station_id.unique().tolist(), ["6158731"])
+        self.assertTrue(np.isnan(joined.temperature_c.iloc[-1]))
+        joined["naps_station_id"] = "060430"
+        validate_frame(joined)  # no misleading mixed-station error
+        manifest = {"latest_pollution_hour_est": "2026-03-12 01:00:00"}
+        with self.assertRaisesRegex(ValueError, "weather is incomplete"):
+            freshness(joined, manifest, "2026-03-12T08:00:00+00:00")
+        mixed = weather.assign(climate_station_id=["1"] + ["2"] * 68)
+        with self.assertRaises(ValueError):
+            attach_weather(daily, mixed)

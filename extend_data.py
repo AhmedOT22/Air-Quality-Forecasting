@@ -147,6 +147,21 @@ def concatenate_hourly(naps, ontario, boundary, end):
     return merged
 
 
+def attach_weather(daily, weather):
+    """Join daily weather; days ECCC has not yet published keep NaN weather values.
+
+    The station identifier is a property of the configured source, not of each
+    returned row, so it is set for every day. A missing latest day then fails the
+    explicit weather-freshness check instead of a misleading mixed-station error.
+    """
+    if weather.climate_station_id.nunique() != 1:
+        raise ValueError("Missing or mixed climate station records")
+    station = weather.climate_station_id.iloc[0]
+    joined = daily.join(weather, validate="one_to_one")
+    joined["climate_station_id"] = station  # in place: column order is unchanged
+    return joined
+
+
 def extend(end=None, raw_dir="data/raw", output_dir="data/processed", refresh=False):
     now = datetime.now(EST)
     end = pd.Timestamp(end or now.date()).normalize()
@@ -226,7 +241,7 @@ def extend(end=None, raw_dir="data/raw", output_dir="data/processed", refresh=Fa
         # archives can be revised even for years in the frozen pollution period.
         sources = [source for source in sources if source["url"] != record["url"]]
         sources.append(record)
-    daily = daily.join(pd.concat(weather_frames), validate="one_to_one")
+    daily = attach_weather(daily, pd.concat(weather_frames))
     daily["naps_station_id"] = "060430"
     daily["ontario_station_id"] = "35125"
     daily["pollution_source"] = np.where(daily.index <= boundary, "NAPS", "Ontario")
