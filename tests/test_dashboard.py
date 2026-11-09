@@ -186,6 +186,26 @@ class DashboardUITests(unittest.TestCase):
         app.selectbox[1].select("Ozone").run()
         self.assertFalse(app.exception)
 
+    def test_live_accuracy_is_hidden_until_enough_scored_pairs(self):
+        bundle = local_bundle()
+        bundle["metrics"] = bundle["metrics"].assign(n=5)
+        with patch("dashboard_data.load_bundle", return_value=bundle):
+            app = self.app()
+        self.assertTrue(any("of 30 scored forecasts" in i.value for i in app.info))
+        self.assertFalse(
+            any("Detailed prospective scores" in e.label for e in app.expander)
+        )
+
+    def test_prospective_performance_visuals_render_once_mature(self):
+        bundle = local_bundle()
+        self.assertFalse(bundle["metrics"].empty)
+        bundle["metrics"] = bundle["metrics"].assign(n=30)
+        with patch("dashboard_data.load_bundle", return_value=bundle):
+            app = self.app()
+        self.assertTrue(
+            any("Detailed prospective scores" in e.label for e in app.expander)
+        )
+
     def test_blocked_refresh_is_visible_without_crashing(self):
         bundle = local_bundle()
         bundle["status"]["publication_status"] = "blocked"
