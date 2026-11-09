@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 
 from aqi import concentration_index, daily_aqi, no2_index, ozone_index, pm25_index, so2_index
-from forecast import backtest, make_features, seasonal_lag
-from tests.test_forecast import fixture
+from features import make_features, seasonal_lag
+from tests.test_features import fixture
+from workflow import evaluate
 
 
 def hourly_fixture():
@@ -100,12 +101,17 @@ class AQITests(unittest.TestCase):
         self.assertEqual(f.aqi_lag_0.iloc[20], frame.AQI.iloc[19])
         changed = frame.copy()
         changed.loc[changed.index[-21]:, 'AQI'] = 999
-        a, _ = backtest(frame, test_days=20, trees=3)
-        b, _ = backtest(changed, test_days=20, trees=3)
-        names = ['ridge_weather', 'forest_lags', 'forest_weather', 'persistence', 'seasonal_naive']
-        np.testing.assert_allclose(a.iloc[:7][names], b.iloc[:7][names])
+        boundary = frame.index[-21]
+        configs = [{'name': 'ridge_1', 'family': 'ridge', 'alpha': 1.0},
+                   {'name': 'persistence', 'family': 'persistence'},
+                   {'name': 'weekly', 'family': 'weekly'}]
+        a, _ = evaluate(frame, boundary, frame.index[-1], configs)
+        b, _ = evaluate(changed, boundary, frame.index[-1], configs)
+        first = a.origin.eq(boundary)
+        np.testing.assert_allclose(a.loc[first, 'predicted'], b.loc[first, 'predicted'])
         self.assertEqual(seasonal_lag(7, 1), 7)
-        self.assertEqual(a.iloc[0].persistence, frame.AQI.iloc[-22])
+        persistence = a.loc[first & a.model.eq('persistence') & a.horizon.eq(1), 'predicted'].iloc[0]
+        self.assertEqual(persistence, frame.AQI.iloc[-22])
 
     def test_gas_export_without_method_and_unpadded_station(self):
         from aqi_data import read_hourly

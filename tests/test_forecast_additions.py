@@ -5,7 +5,7 @@ import pandas as pd
 from forecast_weather import daily, VARIABLES
 from uncertainty import residual_width, attach
 from weather_model import features
-from tests.test_forecast import fixture
+from tests.test_features import fixture
 
 
 class ForecastAdditionsTests(unittest.TestCase):

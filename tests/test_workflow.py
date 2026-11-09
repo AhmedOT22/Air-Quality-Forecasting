@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from etl_contract import validate
-from tests.test_forecast import fixture
+from tests.test_features import fixture
 from workflow import choose, evaluate, forward, tuning_grid
 
 

@@ -15,7 +15,7 @@ import pandas as pd
 
 from etl_contract import CONTRACT_VERSION, validate
 from extend_data import EST, extend
-from forecast import make_features, seasonal_lag
+from features import make_features, seasonal_lag
 from workflow import forward
 
 ROOT = Path(__file__).resolve().parent
@@ -103,7 +103,7 @@ def issue(
     model_bytes = (
         json.dumps(config, sort_keys=True).encode()
         + (ROOT / "workflow.py").read_bytes()
-        + (ROOT / "forecast.py").read_bytes()
+        + (ROOT / "features.py").read_bytes()
         + (
             (ROOT / "weather_model.py").read_bytes()
             if config["name"].startswith("ridge_forecast")

@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import pandas as pd
 from aqi import category, no2_index, ozone_index, pm25_index, so2_index
-from forecast import load_data
+from features import load_data
 
 CONTRACT_VERSION = 1
 DEFAULT_INPUT = Path("data/processed/daily_aqi_latest.csv")

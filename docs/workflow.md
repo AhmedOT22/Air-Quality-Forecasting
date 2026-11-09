@@ -14,9 +14,7 @@ Candidates are direct linear autoregression on AQI history, Ridge with weather,
 index-only random forest, forest with weather, persistence and weekly naive. The
 linear autoregression is a classical lag regression, not a claim to have run ARIMA,
 SARIMA, ETS or Prophet. This bounded candidate set does not establish a globally
-optimal model. Forests use 100 trees, minimum leaf size 5 and seed 42. These are
-separate experiments from the earlier fixed 200-tree benchmarks retained in
-`reports/aqi/2023/` and `/2024/`.
+optimal model. Forests use 100 trees, minimum leaf size 5 and seed 42.
 
 Choose the family using mean MAE with equal fold/horizon weights. Tune the winning
 family on 2024: Ridge alpha 1/10/100 or forest leaf size 5/10/20. AR/baselines are

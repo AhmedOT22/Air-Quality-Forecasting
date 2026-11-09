@@ -92,8 +92,7 @@ this cache. `--refresh` deliberately downloads revised Ontario exports and exten
 weather; rerun downstream work afterward. The compressed hourly snapshot has a fixed
 gzip timestamp for stable content checksums.
 
-The frozen `daily_aqi.csv`, executed notebook and `reports/aqi/2023/` and `/2024/`
-remain the existing historical benchmark. The new `daily_aqi_latest.csv` is the
+The frozen `daily_aqi.csv` remains the historical 2020–2024 archive. The new `daily_aqi_latest.csv` is the
 extended input for subsequent forward forecasting. This acquisition does not
 silently change the sample used to calculate previously published model scores.
 

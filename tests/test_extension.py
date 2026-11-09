@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from extend_data import concatenate_hourly, read_ontario
-from forecast import load_data
+from features import load_data
 
 
 def ontario_fixture(rows):

@@ -3,7 +3,7 @@
 import unittest
 import numpy as np
 import pandas as pd
-from tests.test_forecast import fixture
+from tests.test_features import fixture
 from operations import HISTORY_COLUMNS, OBS_COLUMNS, freshness, issue, observe, score
 
 CONFIG = {"name": "persistence", "family": "persistence"}

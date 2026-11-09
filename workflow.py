@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 from aqi import category
 from etl_contract import validate
-from forecast import make_features, seasonal_lag
+from features import make_features, seasonal_lag
 
 HORIZONS = range(1, 8)
 TREES = 100

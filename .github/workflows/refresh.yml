@@ -12,7 +12,7 @@ on:
       - data_sources.py
       - extend_data.py
       - etl_contract.py
-      - forecast.py
+      - features.py
       - workflow.py
       - forecast_weather.py
       - weather_model.py

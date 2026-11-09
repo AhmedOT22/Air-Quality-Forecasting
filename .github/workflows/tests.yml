@@ -25,7 +25,7 @@ jobs:
             requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m ruff check .
-      - run: python -m compileall -q -x 'notebooks/legacy|\.venv' .
+      - run: python -m compileall -q -x '\.venv' .
       - run: python -m unittest tests.test_dashboard -v
         env:
           AQI_DASHBOARD_OFFLINE: '1'

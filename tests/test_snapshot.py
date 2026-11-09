@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-from forecast import load_data
+from features import load_data
 
 ROOT = Path(__file__).resolve().parents[1]
 

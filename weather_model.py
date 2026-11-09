@@ -8,7 +8,7 @@ from sklearn.linear_model import Ridge
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from etl_contract import validate
-from forecast import make_features
+from features import make_features
 from forecast_weather import VARIABLES
 from workflow import evaluate
 
