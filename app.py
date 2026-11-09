@@ -15,6 +15,8 @@ from dashboard_data import (
     toronto_time,
 )
 
+MIN_LIVE_PAIRS = 30
+
 st.set_page_config(
     page_title="Toronto AQI Observatory",
     page_icon="🌿",
@@ -367,15 +369,30 @@ with performance:
             "Waiting for observed outcomes. Predictions are recorded now; genuine prospective scores appear only after their target AQI becomes available. No live accuracy is claimed yet."
         )
     else:
-        st.dataframe(
-            metrics.rename(
-                columns={"MAE": "MAE · AQI points", "RMSE": "RMSE · AQI points"}
-            ),
-            hide_index=True,
-            width="stretch",
-        )
+        # Accuracy from a handful of overlapping forecasts is noise, not evidence.
+        mature = metrics.loc[metrics.n >= MIN_LIVE_PAIRS]
+        if mature.empty:
+            st.info(
+                f"{int(metrics.n.max())} of {MIN_LIVE_PAIRS} scored forecasts collected for the "
+                "best-covered horizon. Live accuracy is shown once a horizon reaches "
+                f"{MIN_LIVE_PAIRS} matured forecast/observation pairs."
+            )
+        else:
+            st.dataframe(
+                mature.rename(
+                    columns={"MAE": "MAE · AQI points", "RMSE": "RMSE · AQI points"}
+                ),
+                hide_index=True,
+                width="stretch",
+            )
+        pending = metrics.loc[metrics.n < MIN_LIVE_PAIRS]
+        if not mature.empty and not pending.empty:
+            st.caption(
+                f"{len(pending)} model/horizon rows have fewer than {MIN_LIVE_PAIRS} "
+                "scored pairs and are not shown yet."
+            )
         rolling = bundle.get("rolling", pd.DataFrame())
-        if not rolling.empty:
+        if not rolling.empty and not mature.empty:
             with st.expander("Latest 30 scored dates per model and horizon"):
                 st.dataframe(rolling, hide_index=True, width="stretch")
     alerts = bundle.get("alerts", {}).get("alerts", [])
