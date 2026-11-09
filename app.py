@@ -92,6 +92,7 @@ def forecast_chart(primary, challenger, observed, intervals, compare):
             go.Scatter(
                 x=primary.Date,
                 y=primary.upper_AQI,
+                mode="lines",  # no default-coloured markers on the band edges
                 line=dict(width=0),
                 showlegend=False,
                 hoverinfo="skip",
@@ -103,6 +104,7 @@ def forecast_chart(primary, challenger, observed, intervals, compare):
                 y=primary.lower_AQI,
                 fill="tonexty",
                 fillcolor="rgba(22,116,102,.13)",
+                mode="lines",
                 line=dict(width=0),
                 name="90% interval",
                 hoverinfo="skip",
