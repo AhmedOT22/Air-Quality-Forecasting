@@ -1,12 +1,12 @@
 {
   "status": "issued_experimental_challenger",
-  "retrieved_before": "2026-11-09T21:27:12.297174+00:00",
+  "retrieved_before": "2026-11-10T02:17:25.321804+00:00",
   "source": {
     "url": "https://api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-11-09&end_date=2026-11-15&hourly=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Csurface_pressure&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
-    "sha256": "b7a307d8e7871f77b9f19c8a5a40acfd18724612883895126992bce6d4d25294",
-    "downloaded_at": "2026-11-09T21:27:12.196497+00:00",
+    "sha256": "e010d52a20c57ced7bb41df681fc450d4b685cabc97ee7349f10f328b55f1448",
+    "downloaded_at": "2026-11-10T02:17:25.245095+00:00",
     "last_modified": null,
-    "bytes": 6627
+    "bytes": 6634
   },
   "archive_sources": [
     {
