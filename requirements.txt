@@ -1,6 +1,6 @@
 # Pinned runtime: forecasting pipeline + Streamlit dashboard (used by CI and deployment).
 numpy==2.3.5
-pandas==2.2.3
+pandas==2.3.3
 scikit-learn==1.8.0
 matplotlib==3.10.8
 streamlit==1.66.1
