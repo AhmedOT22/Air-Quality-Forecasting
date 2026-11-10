@@ -1,12 +1,12 @@
 {
   "status": "issued_experimental_challenger",
-  "retrieved_before": "2026-11-10T02:17:25.321804+00:00",
+  "retrieved_before": "2026-11-10T18:41:18.149796+00:00",
   "source": {
-    "url": "https://api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-11-09&end_date=2026-11-15&hourly=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Csurface_pressure&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
-    "sha256": "e010d52a20c57ced7bb41df681fc450d4b685cabc97ee7349f10f328b55f1448",
-    "downloaded_at": "2026-11-10T02:17:25.245095+00:00",
+    "url": "https://api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-11-10&end_date=2026-11-16&hourly=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Csurface_pressure&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+    "sha256": "2e49b7db467a09c2fa0f10ed424fb439bb3e5ee61e87ce46c8f9797deb8f9c5b",
+    "downloaded_at": "2026-11-10T18:41:18.079815+00:00",
     "last_modified": null,
-    "bytes": 6634
+    "bytes": 6646
   },
   "archive_sources": [
     {
@@ -24,11 +24,11 @@
       "bytes": 1314347
     },
     {
-      "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-01-01&end_date=2026-11-08&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cwind_speed_10m_previous_day1%2Csurface_pressure_previous_day1%2Ctemperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cwind_speed_10m_previous_day2%2Csurface_pressure_previous_day2%2Ctemperature_2m_previous_day3%2Crelative_humidity_2m_previous_day3%2Cwind_speed_10m_previous_day3%2Csurface_pressure_previous_day3%2Ctemperature_2m_previous_day4%2Crelative_humidity_2m_previous_day4%2Cwind_speed_10m_previous_day4%2Csurface_pressure_previous_day4%2Ctemperature_2m_previous_day5%2Crelative_humidity_2m_previous_day5%2Cwind_speed_10m_previous_day5%2Csurface_pressure_previous_day5%2Ctemperature_2m_previous_day6%2Crelative_humidity_2m_previous_day6%2Cwind_speed_10m_previous_day6%2Csurface_pressure_previous_day6%2Ctemperature_2m_previous_day7%2Crelative_humidity_2m_previous_day7%2Cwind_speed_10m_previous_day7%2Csurface_pressure_previous_day7&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
-      "sha256": "ed393479f8938f2634973efa45b596f33fb9185d5634be56bb229e13592b087b",
-      "downloaded_at": "2026-11-09T08:21:12.569040+00:00",
+      "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-01-01&end_date=2026-11-09&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cwind_speed_10m_previous_day1%2Csurface_pressure_previous_day1%2Ctemperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cwind_speed_10m_previous_day2%2Csurface_pressure_previous_day2%2Ctemperature_2m_previous_day3%2Crelative_humidity_2m_previous_day3%2Cwind_speed_10m_previous_day3%2Csurface_pressure_previous_day3%2Ctemperature_2m_previous_day4%2Crelative_humidity_2m_previous_day4%2Cwind_speed_10m_previous_day4%2Csurface_pressure_previous_day4%2Ctemperature_2m_previous_day5%2Crelative_humidity_2m_previous_day5%2Cwind_speed_10m_previous_day5%2Csurface_pressure_previous_day5%2Ctemperature_2m_previous_day6%2Crelative_humidity_2m_previous_day6%2Cwind_speed_10m_previous_day6%2Csurface_pressure_previous_day6%2Ctemperature_2m_previous_day7%2Crelative_humidity_2m_previous_day7%2Cwind_speed_10m_previous_day7%2Csurface_pressure_previous_day7&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+      "sha256": "a73217c9ff66adc275bfa22fc154464ae455151cb2b4642c01c5addf97287afd",
+      "downloaded_at": "2026-11-10T18:41:17.641015+00:00",
       "last_modified": null,
-      "bytes": 1125799
+      "bytes": 1129276
     }
   ],
   "attribution": "Open-Meteo.com, CC BY 4.0"
