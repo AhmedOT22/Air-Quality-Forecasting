@@ -104,7 +104,7 @@
   "start": "2020-01-01",
   "end": "2026-11-10",
   "requested_ontario_end": "2026-11-11",
-  "latest_pollution_hour_est": "2026-11-11 12:00:00",
+  "latest_pollution_hour_est": "2026-11-11 13:00:00",
   "time_basis": "Fixed local standard time UTC-5, hour-ending intervals stored at interval starts",
   "source_priority": "NAPS 2020-2024 including its gaps; Ontario from 2025 onward; no overlap averaging",
   "ontario_station_id": "35125",
@@ -124,7 +124,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 515,
-      "valid_hours": 59306,
+      "valid_hours": 59307,
       "units": "micrograms per cubic metre",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
@@ -141,7 +141,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 785,
-      "valid_hours": 59036,
+      "valid_hours": 59037,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
@@ -158,7 +158,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 852,
-      "valid_hours": 58969,
+      "valid_hours": 58970,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     },
@@ -175,7 +175,7 @@
         "2026-09-05"
       ],
       "rejected_missing_or_negative_readings": 2179,
-      "valid_hours": 57642,
+      "valid_hours": 57643,
       "units": "parts per billion",
       "time_basis": "Hour-ending intervals in fixed EST (UTC-5), per CSV footer"
     }
@@ -240,8 +240,8 @@
     }
   },
   "hourly_file": "hourly_pollution_2020_latest.csv.gz",
-  "hourly_sha256": "5de27f0056cd4db134aad09f29aad1ef8c7877221c888b4b97d6ae46142fda61",
-  "prepared_sha256": "d22016ca7980d1f7e8218917b62e9d0c9aade7cd92994be6e7154f9f1a4604bd",
+  "hourly_sha256": "d87381c1fe3dcfab730f102aa5dc170df85bb31d3088e4414ca2ea82af640fd0",
+  "prepared_sha256": "4f6065382b18288c3e36884f107765ad583b0f523ac6f8e74befdd62d474b4db",
   "sources": [
     {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FProgramInformation-InformationProgramme%2FStationsNAPS-StationsSNPA.csv",
@@ -265,11 +265,25 @@
       "bytes": 11471289
     },
     {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2020&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "49622b8ccf880adb56207cf454777852851fd54c8208be1dffb4f49c52111c0c",
+      "downloaded_at": "2026-10-31T13:51:59.076984+00:00",
+      "last_modified": null,
+      "bytes": 3364841
+    },
+    {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2021%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2021.csv",
       "sha256": "b05f0f5eac83c3ea6efbf0587c4e9d30c5795981c47611da521da28123d17d52",
       "downloaded_at": "2026-10-31T13:55:32.244097+00:00",
       "last_modified": null,
       "bytes": 10149208
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2021&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "b10d9e56b4d3ab70b7b65764e2f29b903c576a04e45e235c5469ae2ba1aa8479",
+      "downloaded_at": "2026-10-31T13:51:59.252909+00:00",
+      "last_modified": null,
+      "bytes": 3355367
     },
     {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2022%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2022.csv",
@@ -279,6 +293,13 @@
       "bytes": 12339077
     },
     {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2022&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "ddd78889f11d37ac534e017e78cb6b96d765f903f538f516cd7b1ecac72a1d56",
+      "downloaded_at": "2026-10-31T13:52:03.679752+00:00",
+      "last_modified": null,
+      "bytes": 3354041
+    },
+    {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2023%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2023.csv",
       "sha256": "9d87fd544c88bb42aa16aac092838e75bff65a624ffc670e6563a9adc036535a",
       "downloaded_at": "2026-10-31T13:55:32.664441+00:00",
@@ -286,11 +307,25 @@
       "bytes": 14824404
     },
     {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2023&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "fa8cce0b870c58e2f76b8a029594bbf7cb3bdb7b16f4ef9e0b051ebd71a10f53",
+      "downloaded_at": "2026-10-31T13:52:03.622019+00:00",
+      "last_modified": null,
+      "bytes": 3356007
+    },
+    {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2024%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FPM25_2024.csv",
       "sha256": "b52e88c4394a339640ce4cf99e8dc9540f2a1769d80e355b0db524d4cbc1ebea",
       "downloaded_at": "2026-10-31T13:55:32.336803+00:00",
       "last_modified": null,
       "bytes": 9690501
+    },
+    {
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2024&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
+      "sha256": "cec310ffa1b0aea9afd259469bbc0848241a9e284639a2e66a6ad187c27160e0",
+      "downloaded_at": "2026-10-31T13:52:07.254799+00:00",
+      "last_modified": null,
+      "bytes": 3364995
     },
     {
       "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2020%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FO3_2020.csv",
@@ -399,81 +434,81 @@
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=124&s_startDate=2020-01-01&s_endDate=2026-11-11&s_reportType=CSV",
-      "sha256": "960c9ec2bd797da00fea3b522ff9e969496c729e7bc9ad2a1119f8235f69443d",
-      "downloaded_at": "2026-11-11T18:43:10.086589+00:00",
+      "sha256": "73e6fcd1435fe491358474b825a876ca184fa57486d99244de43606791e477b7",
+      "downloaded_at": "2026-11-11T20:11:48.258256+00:00",
       "last_modified": null,
-      "bytes": 243632
+      "bytes": 243634
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=122&s_startDate=2020-01-01&s_endDate=2026-11-11&s_reportType=CSV",
-      "sha256": "b31e62b6f4787715ba04c86c165e8894a10d7a5dafc61bd2e582d8e6c37841b3",
-      "downloaded_at": "2026-11-11T18:43:13.727063+00:00",
+      "sha256": "04a63bae848ef18d60776cdd58cc0141fc31495dd924b04cc1ab23a2427d1af4",
+      "downloaded_at": "2026-11-11T20:12:01.684020+00:00",
       "last_modified": null,
-      "bytes": 232587
+      "bytes": 232590
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=36&s_startDate=2020-01-01&s_endDate=2026-11-11&s_reportType=CSV",
-      "sha256": "f83a076c4a7d0dbf3f075fa731781e21aaed9f9e80ef3ff0773919b6eee0076e",
-      "downloaded_at": "2026-11-11T18:43:17.216333+00:00",
+      "sha256": "07a9a13cff1f45eeb5bcc3910dab91d1f14e285ac8b42a0a05f8fb627dbfe6de",
+      "downloaded_at": "2026-11-11T20:12:14.138521+00:00",
       "last_modified": null,
-      "bytes": 349753
+      "bytes": 349758
     },
     {
       "url": "https://www.airqualityontario.com/history/searchResults.php?page=CSV&s_categoryId=Personal&s_stationId=35125&s_pollutantId=9&s_startDate=2020-01-01&s_endDate=2026-11-11&s_reportType=CSV",
-      "sha256": "fc685d6f3a053d704a18ebdb0363f74fd8ee58b11d8f52bb429ec6e40a722451",
-      "downloaded_at": "2026-11-11T18:43:20.522315+00:00",
+      "sha256": "ebef9373d020cdc8a9ca5310c6feff299f22c0b65250d31bd088d4ed316b1a66",
+      "downloaded_at": "2026-11-11T20:12:24.635415+00:00",
       "last_modified": null,
-      "bytes": 280596
+      "bytes": 280600
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2020&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "65f46b4a37ebc9921d04d3f9eab67d931b55abd1814e29f8c5dee9fe0ea0ef1e",
-      "downloaded_at": "2026-10-31T17:32:55.403366+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2020&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "c695f81fc2ee235f55219e91d8c1218bec039e2470cc15fff7ac05995df05c23",
+      "downloaded_at": "2026-11-11T20:12:26.649269+00:00",
       "last_modified": null,
-      "bytes": 3364841
+      "bytes": 4799540
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2021&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "9d832f2ea4dc81f6abc0a6aa07e06522bbafdcdd8c174367ea16c55a4c3cd154",
-      "downloaded_at": "2026-10-31T17:32:56.406093+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2021&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "a342fb6bad85373e3da19ee341f6eac04160e85fda3bca3801242675cf5d1bfa",
+      "downloaded_at": "2026-11-11T20:12:27.987066+00:00",
       "last_modified": null,
-      "bytes": 3355367
+      "bytes": 4786200
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2022&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "230abcb43ac2c70b5eb0ab5105c515b27acb49f3c6b4eaa0ed961052e7382308",
-      "downloaded_at": "2026-10-31T17:32:57.436812+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2022&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "6875904b6bcb347ea13e6dbc70c0b29f1bf85fe62074e68faf90924aaaa7afb6",
+      "downloaded_at": "2026-11-11T20:12:29.163336+00:00",
       "last_modified": null,
-      "bytes": 3354041
+      "bytes": 4784512
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2023&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "251535fc36746f05e7aa90186246e9b623ac4c8e91c32dda854d7c32a9ffe85a",
-      "downloaded_at": "2026-10-31T17:32:58.409988+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2023&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "c870f7f86201bdcc98599e449353c4d77e7318394e763d7c12bf0919bde30bf2",
+      "downloaded_at": "2026-11-11T20:12:30.396007+00:00",
       "last_modified": null,
-      "bytes": 3356007
+      "bytes": 4786535
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2024&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "17ab7907b16d9e22acc7454da60a8421a49fb43fb0dcde3d3f2546cf65d8ac9d",
-      "downloaded_at": "2026-10-31T17:32:59.198324+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2024&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "76734939b028f64cd2a652ebe7a418a8f220627cba7596396fbe90707c7e5ab6",
+      "downloaded_at": "2026-11-11T20:12:31.526030+00:00",
       "last_modified": null,
-      "bytes": 3364995
+      "bytes": 4798301
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2025&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "716774935dcf237fc6dff11a4cbd6dd99aeeb2e108dc5c4c388450890f314665",
-      "downloaded_at": "2026-11-11T18:43:23.521610+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2025&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "5d53c2e04127f9d8d9b35fb4ca3b064cfeca7bb323ea5a8205b5d05e036b7651",
+      "downloaded_at": "2026-11-11T20:12:32.804250+00:00",
       "last_modified": null,
-      "bytes": 3356446
+      "bytes": 4789276
     },
     {
-      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2026&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG",
-      "sha256": "5a5b95ffc96f31c3739099a7ae553cefd2996aee91031da27aa632234a27506a",
-      "downloaded_at": "2026-11-11T18:43:25.470391+00:00",
+      "url": "https://api.weather.gc.ca/collections/climate-hourly/items?f=json&CLIMATE_IDENTIFIER=6158731&LOCAL_YEAR=2026&limit=10000&properties=CLIMATE_IDENTIFIER%2CLOCAL_DATE%2CTEMP%2CTEMP_FLAG%2CRELATIVE_HUMIDITY%2CRELATIVE_HUMIDITY_FLAG%2CWIND_SPEED%2CWIND_SPEED_FLAG%2CSTATION_PRESSURE%2CSTATION_PRESSURE_FLAG%2CDEW_POINT_TEMP%2CDEW_POINT_TEMP_FLAG%2CVISIBILITY%2CVISIBILITY_FLAG%2CWIND_DIRECTION%2CWIND_DIRECTION_FLAG%2CWEATHER_ENG_DESC",
+      "sha256": "0691c1fa80cca087f43d1b3a13ccf9d6249a2aa096d389f287c5eeee7a2af808",
+      "downloaded_at": "2026-11-11T20:12:34.029266+00:00",
       "last_modified": null,
-      "bytes": 2886871
+      "bytes": 4119784
     }
   ],
-  "prepared_at": "2026-11-11T18:43:26.143328+00:00"
+  "prepared_at": "2026-11-11T20:12:35.054029+00:00"
 }
