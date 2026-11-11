@@ -123,7 +123,7 @@ def forecast_chart(primary, challenger, observed, intervals, compare):
                 fillcolor="rgba(22,116,102,.13)",
                 mode="lines",
                 line=dict(width=0),
-                name="90% interval",
+                name="Likely range (90%)",
                 hoverinfo="skip",
             )
         )
@@ -131,7 +131,7 @@ def forecast_chart(primary, challenger, observed, intervals, compare):
         go.Scatter(
             x=primary.Date,
             y=primary.predicted_AQI,
-            name="Primary forecast",
+            name="Forecast",
             mode="lines+markers",
             line=dict(color="#167466", width=3),
             marker=dict(size=8),
@@ -253,7 +253,7 @@ a.metric(
     delta_color="off",
 )
 b.metric(
-    "Highest in selected outlook",
+    "Highest this week",
     f"{peak.predicted_AQI:.0f}",
     f"{peak.Date:%a, %b %d}",
     delta_color="off",
@@ -261,13 +261,13 @@ b.metric(
 if has_chance:
     flagged = primary.apply(advice, axis=1).ne("Good day for outdoor plans")
     c.metric(
-        f"Chance of Moderate or worse · {next_row.Date:%b %d}",
+        f"Chance above 50 · {next_row.Date:%b %d}",
         f"{next_row.p_moderate:.0%}",
-        "AQI above 50",
+        "Moderate or worse",
         delta_color="off",
     )
     d.metric(
-        "Days flagged in this outlook",
+        "Days flagged",
         f"{int(flagged.sum())} of {len(primary)}",
         "Heads-up or alert",
         delta_color="off",
@@ -298,7 +298,7 @@ with outlook:
         width="stretch",
         config={"displayModeBar": False},
     )
-    left, right = st.columns([2, 1])
+    left = st.container()
     with left:
         table = primary[["Date", "predicted_AQI"]].copy()
         table["Category"] = table.predicted_AQI.map(
@@ -310,8 +310,8 @@ with outlook:
                 for low, high in zip(primary.lower_AQI, primary.upper_AQI)
             ]
         if has_chance:
-            table["Chance above 50"] = primary.p_moderate.to_numpy()
-            table["Chance above 100"] = primary.p_unhealthy_sensitive.to_numpy()
+            table["Chance above 50"] = primary.p_moderate.to_numpy() * 100
+            table["Chance above 100"] = primary.p_unhealthy_sensitive.to_numpy() * 100
             table["What to do"] = primary.apply(advice, axis=1).to_numpy()
         table = table.rename(columns={"Date": "Day", "predicted_AQI": "Forecast AQI"})
         st.dataframe(
@@ -321,9 +321,9 @@ with outlook:
             column_config={
                 "Forecast AQI": st.column_config.NumberColumn(format="%.0f"),
                 "Chance above 50": st.column_config.ProgressColumn(
-                    format="percent", min_value=0, max_value=1
+                    format="%.0f%%", min_value=0, max_value=100
                 ),
-                "Chance above 100": st.column_config.NumberColumn(format="percent"),
+                "Chance above 100": st.column_config.NumberColumn(format="%.0f%%"),
                 "Day": st.column_config.DateColumn(format="ddd, MMM D"),
             },
         )
@@ -334,13 +334,12 @@ with outlook:
             f"likely range held {coverage.observed_coverage.min():.0%}–{coverage.observed_coverage.max():.0%} "
             "of outcomes. Sudden wildfire smoke can arrive with little warning."
         )
-    with right:
-        st.markdown("**Read the outlook**")
-        st.markdown(
-            "**0–50** · Good\n\n**51–100** · Moderate\n\n**101–150** · Unhealthy for sensitive groups\n\n**151–200** · Unhealthy\n\n**201–300** · Very unhealthy\n\n**301+** · Hazardous"
-        )
     st.caption(
-        "The first forecast is a same-day estimate. Only forecasts issued before the target date starts enter prospective metrics. The weather-aware challenger is experimental and does not replace the primary model."
+        "AQI scale: 0–50 Good · 51–100 Moderate · 101–150 Unhealthy for sensitive groups · "
+        "151–200 Unhealthy · 201–300 Very unhealthy · 301+ Hazardous"
+    )
+    st.caption(
+        "The first day is issued the same morning, so it is left out of the live track record. The smoke-aware challenger is experimental and never replaces the main forecast automatically."
     )
     st.download_button(
         "Download displayed forecasts",
@@ -405,8 +404,8 @@ with observations:
         f"Component detail uses the frozen snapshot through {history.Date.max():%b %d, %Y}; it is an AQI sub-index, not pollutant concentration."
     )
 with performance:
-    st.subheader("Evidence, with the time boundary intact")
-    st.markdown("**Prospective monitoring**")
+    st.subheader("How reliable is the outlook?")
+    st.markdown("**Live track record**")
     if metrics.empty:
         st.info(
             "Waiting for observed outcomes. Predictions are recorded now; genuine prospective scores appear only after their target AQI becomes available. No live accuracy is claimed yet."

@@ -226,9 +226,9 @@ class DashboardUITests(unittest.TestCase):
         app = self.app()
         table = app.dataframe[0].value
         self.assertIn("Chance above 50", table)
-        self.assertTrue(table["Chance above 50"].between(0, 1).all())
+        self.assertTrue(table["Chance above 50"].between(0, 100).all())
         self.assertTrue(table["What to do"].str.len().gt(0).all())
-        self.assertTrue(any("Chance of Moderate" in m.label for m in app.metric))
+        self.assertTrue(any("Chance above 50" in m.label for m in app.metric))
 
     def test_ledger_from_before_the_model_release_still_renders(self):
         bundle = local_bundle()
