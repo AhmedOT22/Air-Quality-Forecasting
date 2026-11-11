@@ -1,138 +1,107 @@
-# Automatic forecasts and prospective monitoring
+# Operations
 
-The GitHub Actions workflow `Refresh forecasts and monitor outcomes` runs at **11:17
-and 17:17 UTC daily** and supports manual dispatch. In Toronto that is 07:17/13:17
-in daylight time and 06:17/12:17 in standard time. The second attempt allows recovery
-from morning provider delays. GitHub scheduling is best effort, not an uptime SLA.
+How the outlook is produced, recorded and scored every day, and how to run the
+dashboard.
 
-Run locally with `python operations.py`. The default downloads fresh pollution and
-weather; `--snapshot` is a freshness-checked smoke option, not a bypass for old data.
-No API keys are needed for the currently configured public sources.
+## The scheduled refresh
 
-## Refresh and publication
+`.github/workflows/refresh.yml` runs at 11:17 and 17:17 UTC, and on pushes that
+change the model or data. It runs `python -m airquality refresh`, which:
 
-1. Verify the locked historical release. Keep its ETL and selected Ridge alpha 1 fixed.
-2. Refresh observations into temporary staging, preserving the frozen notebook data.
-3. Apply the same ETL validation contract to the candidate production snapshot.
-4. Require exactly yesterday's completed EST origin, pollution no older than six
-   hours, all four origin-day weather fields and the required observed AQI lag history.
-5. Refit the approved model and generate seven daily predictions. Missing/stale
-   inputs block issuance; no quiet fallback to an earlier origin occurs.
-6. Archive the first issuance per origin/model version. Reruns cannot rewrite it.
-7. Commit small reports/history to the `data` branch (keeping automated commits out
-   of `main`) and retain full input snapshots as workflow artifacts for 90 days. Raw download caching reduces repeated national downloads.
+1. **Downloads fresh observations** into a temporary folder. The locked research
+   dataset is never modified.
+2. **Validates** them with the same data contract as the research dataset.
+3. **Checks freshness:** the last complete day must be yesterday, pollution readings
+   under six hours old, weather complete, and the required AQI history present.
+4. **Fetches forecast inputs:** the weather forecast for the next seven days
+   (required) and the CAMS forecast (for the challenger only).
+5. **Refits** the frozen model configuration on all available history and issues
+   seven forecasts, each with a likely range and the chances of exceeding AQI 50
+   and 100.
+6. **Records** them in the forecast ledger. A forecast for a given day, horizon and
+   model version is written once and never changed.
+7. **Scores** earlier forecasts whose real AQI has since arrived.
+8. **Publishes** the ledger to the `data` branch, keeping automated commits off
+   `main`.
 
-`status.json` is authoritative for freshness and success. A refresh that cannot
-publish records `publication_status: blocked` with the reason and preserves the prior
-forecast as historical output. Inputs that are simply not ready yet (for example,
-ECCC has not published yesterday's weather, or the origin is stale) raise
-`PublicationBlocked`: that is the designed safe outcome, so the job finishes green
-with a "No forecast issued" notice in the run summary. Any other error, such as a
-failed download, invalid data or a code fault, still fails the workflow visibly. The schedule does not retune models or automatically
-promote a challenger. Publication is restricted to `reports/operational/`; frozen
-benchmark snapshots and their lock are not renewed by the scheduled job.
+The refresh never retunes or reselects the model.
 
-The release snapshot remains manually locked. Automatic refreshes are validated
-candidate production versions under that fixed contract, not implicit changes to
-cleaning rules or a replacement of the reproducible historical analysis.
+## When no forecast is issued
 
-## Forecast and observation ledger
+| Situation | What happens |
+| --- | --- |
+| Inputs not ready (for example, yesterday's weather not yet published) | The run records `publication_status: blocked` with the reason and finishes **green**, with a "No forecast issued" notice. The next run tries again. |
+| A download fails, data is invalid, or the code errors | The run **fails** (red) and records the error. |
+| The CAMS forecast is unavailable | The main outlook is still issued; only the challenger is skipped. |
 
-`forecast_history.csv` stores issuance time, target date, origin, horizon, model
-identity, implementation revision, prediction, optional bounds, input checksum and
-both baseline predictions. Model identity includes hyperparameters and relevant
-forecast implementation bytes. New versions remain distinguishable in metrics.
-Issuance time is read after inference. Scoring accepts ISO timestamps with or
-without fractional seconds; monitoring alerts include the model version.
+The dashboard shows a blocked refresh as a warning and keeps the last outlook, marked
+as historical.
 
-Only target dates that start after the issuance's fixed-EST date count as
-**prospective**. Same-day h1 forecasts are retained and explicitly excluded from
-prospective performance; the current completed-day design therefore initially
-collects strictly prospective evidence for horizons 2–7.
+## The ledger (`reports/operational/`)
 
-AQI for date D may include next-morning ozone. Observations are scored only after
-completed D+1, conservatively from D+2 at 00:00 EST. Only dates for already issued
-forecasts are collected. There is no manufactured historical prospective track record.
+| File | Contents |
+| --- | --- |
+| `status.json` | Result of the latest run and why |
+| `latest_forecast.csv` | The current 7-day outlook |
+| `forecast_history.csv` | Every forecast ever issued, with its model version |
+| `observation_history.csv` | The observed AQI for forecast days, as first seen and as revised |
+| `scores.csv`, `metrics.csv`, `rolling_metrics.csv` | Each scored forecast; error by model and horizon |
+| `forecast_inputs.csv` | The weather and CAMS forecasts retrieved at each run, by lead: the honest record for judging the challenger later |
+| `alerts.json` | Monitoring notes, such as a model doing worse than the naive guess |
 
-`observation_history.csv` preserves the first eligible observed truth and later
-value/quality revisions, including reversions to an earlier value. `scores.csv`
-uses first eligible truth for headline errors and retains latest truth separately.
-Provider truth remains provisional and can be revised. Missing targets stay unscored.
+Rules for an honest live record:
 
-`metrics.csv` reports MAE/RMSE, persistence and weekly MAE, persistence skill and
-interval coverage by model version/horizon on identical eligible pairs.
-`rolling_metrics.csv` uses the latest 30 scored target days per version/horizon.
-`alerts.json` flags worse-than-persistence MAE after at least 20 pairs, or a 50%
-increase versus the preceding 30-pair window (also at least 20). These are local
-report diagnostics, not external notifications or significance tests. Overlapping
-forecast windows are dependent. With no mature observations, metrics remain empty
-and alerts explicitly say `collecting_observations`.
+- The first-day forecast is issued the same morning, so only days 2–7 count as
+  genuinely ahead of time.
+- A forecast is scored against the AQI as first published; later revisions are kept
+  alongside.
+- Each forecast carries a model version, a hash of the model configuration and
+  `MODEL_VERSION`. Editing code does not change it; changing the model does.
+- Live accuracy is shown only once a horizon has 30 scored forecasts.
 
-## Prediction intervals
+The copy of this folder on `main` is a bundled sample for the notebook, tests and
+offline use. The live ledger is on the `data` branch.
 
-`uncertainty.py` builds rolling split-conformal intervals. Each horizon's half-width
-is the finite-sample 90% quantile of absolute out-of-sample errors whose target dates
-fall in the 180 days before the forecast origin; lower AQI is bounded at zero.
+## Run a refresh by hand
 
-The error stream comes from yearly chronological refits: 2023 is forecast by a model
-fitted through 2022, and so on to October 2026 (`reports/uncertainty/residuals.csv`).
-At each refresh `operations.py` adds the scored live errors of the primary model,
-which replace retrospective errors on the same date and horizon, and recomputes the
-widths. If a window holds fewer than 30 errors, the latest 180 known errors are used.
+```bash
+python -m airquality refresh
+```
 
-The window was chosen on 2025 only, from 90/180/365/730 days, by a rule fixed in
-advance: every horizon within one point of 90%, then the narrowest band. The 180-day
-window covered 90.0–90.6% per horizon in 2025. **On held-out 2026 it covered
-89.8–90.8% per horizon** (`calibration.csv`, `window_selection.csv`). The previous
-fixed calibration (January–June 2026) covered only 79–87% over July–September,
-because it never saw summer errors.
+It needs network access and writes to `reports/operational/`. To exercise the code on
+the locked dataset without downloading observations:
 
-Serial dependence and nonstationarity mean coverage is an estimate, not a guarantee.
-Live first-issuance coverage is measured separately. Do not interpret the bands as
-validated health-warning intervals.
+```bash
+python -m airquality refresh --snapshot
+```
 
-## Forecast-weather integration
+## The dashboard
 
-`forecast_weather.py` retrieves Open-Meteo lead-specific archived forecasts from
-2024 onward and current hourly forecasts for Pearson, normalizing fixed EST,
-18-hour coverage, temperature, humidity, wind speed and pressure (hPa → kPa).
-These are model forecasts, not observed target-day weather.
+```bash
+streamlit run app.py
+```
 
-`weather_model.py` adds the archived horizon-specific forecast variables to the
-same AQI-history features and fits a Ridge alpha 1 challenger. Its 2026 Jan–Sep
-retrospective comparison uses identical pairs to the approved Ridge and persistence,
-with fitting ending in 2025. One-day MAE was 10.962 versus 11.816 for the approved
-Ridge on 209 common pairs. This is exploratory, not a promotion decision.
+It is read-only: it displays published reports and never trains a model or calls the
+pollution sources. It reads the ledger from the `data` branch, falls back to `main`,
+then to the bundled copy, and says which one it is showing.
 
-Fixed-lead archived fields are proxies for forecasts from the origin day; exact
-provider publication timestamps are not available. Therefore the historical
-comparison is not claimed to be exact production-vintage validation. The live
-weather payload, source checksum and retrieval time are preserved before challenger
-issuance. The current forecast is fetched before the recorded issuance time.
+| Tab | What it answers |
+| --- | --- |
+| Outlook | What to expect each day: forecast, likely range, chance of exceeding 50 and 100, and a flag |
+| Observed history | What the air has been like, by pollutant |
+| How reliable is it? | The live record, the 2026 back-test and how good the flags were |
+| About the model | How it works and what it relies on |
 
-Both primary and experimental challenger predictions are archived and monitored
-separately. Challenger weather failure leaves a valid primary forecast available
-and writes `weather_status.json` with the reason. The challenger has no interval
-bounds yet; primary calibration is not reused for a different model.
+**Deploy on Streamlit Community Cloud:** create an app from this repository, branch
+`main`, main file `app.py`. No secrets are needed.
 
-Weather data: [Open-Meteo](https://open-meteo.com/), CC BY 4.0.
-[Previous Runs documentation](https://open-meteo.com/en/docs/previous-runs-api).
-No provider concentration/AQHI forecasts are substituted for this project's AQI model.
+## Continuous integration
 
-## Outputs
+`.github/workflows/tests.yml` runs on every push: the unit tests, lint and format
+checks, the dashboard tests, and a job that verifies the locked dataset, re-runs the
+whole pipeline and re-runs the notebook.
 
-The live ledger lives on the [`data` branch](https://github.com/AhmedOT22/Air-Quality-Forecasting/tree/data/reports/operational);
-`reports/operational/` on `main` is a snapshot used for offline dashboard tests and the notebook.
+## Attribution
 
-- `latest_forecast.csv`: latest primary and challenger predictions.
-- `forecast_history.csv`, `observation_history.csv`: persistent prediction/truth history.
-- `scores.csv`, `metrics.csv`, `rolling_metrics.csv`, `alerts.json`: prospective diagnostics.
-- `status.json`, `latest_manifest.json`, `weather_status.json`: freshness and provenance.
-- Workflow artifacts: production daily/hourly snapshots and lock, weather forecast
-  payloads/sidecars and interval calibration. Artifacts expire after 90 days; the
-  committed ledgers persist. This is not a claim of indefinite raw snapshot retention.
-
-A Streamlit interface is available in `app.py`; see [dashboard setup](dashboard.md).
-It reads these reports and never triggers training or data refresh from the UI.
-Prospective performance requires future observations to arrive, so successful
-deployment does not itself demonstrate forecast skill.
+Weather and air-quality forecasts by Open-Meteo.com (CC BY 4.0), including CAMS data
+from the Copernicus Atmosphere Monitoring Service.

@@ -1,113 +1,125 @@
-# Toronto Air Quality Forecasting
+# Toronto Air Quality Outlook
 
 [![Forecast tests](https://github.com/AhmedOT22/Air-Quality-Forecasting/actions/workflows/tests.yml/badge.svg)](https://github.com/AhmedOT22/Air-Quality-Forecasting/actions/workflows/tests.yml)
 
-**Daily Air Quality Index (AQI) forecasts for Toronto, 1–7 days ahead — trained,
-tested on a held-out year, and published automatically twice a day.**
+**A 7-day air-quality outlook for Toronto that says what to expect, how sure it is,
+and when to change your plans.**
 
 Python · pandas · scikit-learn · Streamlit · GitHub Actions
 
-![Dashboard: observed AQI, the 7-day forecast and its 90% range](docs/images/dashboard.png)
+![Dashboard: the 7-day outlook with likely range, chance of poor air and guidance](docs/images/dashboard.png)
 
-The system builds a daily AQI from public government monitoring data, picks a model
-with leak-free time-series testing, then issues a new 7-day forecast twice a day and
-scores each one once the real value is known.
+## The problem
 
-**Start here:** the [notebook](AirQuality.ipynb) tells the whole story in ten short
-sections, from the raw data to where the model fails. The **latest live forecasts**
-are in [`reports/operational/`](https://github.com/AhmedOT22/Air-Quality-Forecasting/tree/data/reports/operational)
+People with asthma, parents, coaches and outdoor workers plan days ahead, but
+official air-quality forecasts in Canada look only about two days out. This project
+forecasts the daily Air Quality Index (AQI) at the Toronto West monitor **1 to 7 days
+ahead** and turns each forecast into a decision aid:
+
+- a **forecast** and the **range** the real value should fall in 9 days out of 10;
+- the **chance** the day ends above AQI 50 (Moderate) or 100 (unhealthy for
+  sensitive groups);
+- a plain **flag**: good for outdoor plans, heads-up, or unhealthy-air alert.
+
+It refreshes itself twice a day, records every forecast permanently, and scores each
+one once the real value is known.
+
+**Start here:** the [notebook](AirQuality.ipynb) tells the whole story with charts.
+The **latest live outlook** is in
+[`reports/operational/`](https://github.com/AhmedOT22/Air-Quality-Forecasting/tree/data/reports/operational)
 on the `data` branch.
 
 ## Results
 
-The model is **Ridge regression** (one per forecast horizon). It was chosen using
-2022–2024 data, frozen, and then tested once on **2025**, a year it never saw:
+The model was chosen on 2024–2025 and then tested once on **2026**, a year it never
+saw (January 1 to November 9, every model scored on the same days):
 
-| Days ahead | Forecast error | Naive guess error | Less error | Right AQI category |
-| --- | ---: | ---: | ---: | ---: |
-| 1 | **10.8** | 14.9 | **27%** | **76%** (naive 68%) |
-| 3 | **12.5** | 15.6 | **20%** | **73%** (naive 65%) |
-| 7 | **12.2** | 16.4 | **26%** | **74%** (naive 61%) |
+| Days ahead | This model | Previous model | Naive guess | Less error than naive | Right AQI category |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | **8.8** | 11.7 | 16.2 | **45%** | **84%** (naive 69%) |
+| 3 | **10.9** | 12.5 | 17.4 | **37%** | **76%** (naive 66%) |
+| 5 | **11.7** | 13.2 | 17.6 | **34%** | **79%** (naive 65%) |
+| 7 | **12.3** | 13.2 | 18.8 | **35%** | **76%** (naive 66%) |
 
-Errors are mean absolute error in AQI points, over 306–314 days per horizon. The
-naive guess, "same as the latest known day", is the standard benchmark a forecast must
-beat; Ridge beats it at every horizon from 1 to 7 days.
+Errors are the average miss in AQI points (lower is better). The naive guess is "same
+as the latest known day", the standard benchmark a forecast has to beat.
 
-**Where it fails: pollution spikes.** Like most regression models, it pulls forecasts
-toward typical values. It runs about 12 points high on the cleanest days and far too
-low on the worst ones: every 2025 day above AQI 100 that it forecast came out below
-100. The worst misses were sudden PM2.5 spikes, the signature of wildfire smoke, which
-local data cannot see coming.
+**As a decision aid (2026):**
 
-![2025 one-day forecasts against observed AQI, with the days above 100 marked](docs/images/forecast-vs-observed-2025.png)
+- **Flags caught 82% of days above AQI 50**, 86% one day ahead. About half of
+  one-day flags and a third of longer-range flags were right, so a flag means "poorer
+  air is plausible, check again tomorrow", and no flag is reliable good news.
+- **The chances mean what they say:** when the outlook gave a 25–50% chance of
+  exceeding 50, it happened 35% of the time; above 75%, 81% of the time.
+- **The likely range held** 90–92% of outcomes at every horizon.
+- **Days above 100:** 3 of 4 were flagged the day before with no false alarms, and
+  none two or more days ahead (see Limits).
 
-**Also found:**
-- **Fine particles drive bad days.** PM2.5 decided 83% of days above AQI 50 in the
-  exploration years; ozone matters on some summer days.
-- **Recent AQI only helps for a few days.** One day out, the forecast leans on the latest
-  reading and wind speed; from about three days out, time of year and the 7-day average
-  take over ([`reports/explain/`](reports/explain/)).
-- **The model types finished close together.** Ridge, random forests and gradient
-  boosting were within a few tenths of a point on 2022–23; Ridge is the simplest of
-  near-equals ([`reports/workflow/`](reports/workflow/)).
-- **The 90% range is honest.** Each forecast's range is set from the model's errors
-  over the last 180 days. Checked on 2026, it contained the real value 89.8–90.8% of the
-  time at each horizon ([`reports/uncertainty/`](reports/uncertainty/)).
+## What the study found
+
+**1. Better inputs beat better algorithms.** Each step up this ladder is a new
+input, not a fancier model. Readings already in hand and a weather forecast cut error
+by 13% against the previous model; swapping the model type alone changed it by 2–4%.
+
+![Average error on the validation years for each candidate](docs/images/model-ladder.png)
+
+**2. Wind, heat and season explain ordinary days.** On calm days 42% exceed AQI 50;
+on windy days 10%. Air from the south is about 12 points dirtier than air from the
+north. That is why the weather forecast for the target day is the main driver of the
+outlook from two days out.
+
+![Poor-air days by wind speed, wind direction and temperature](docs/images/weather-drivers.png)
+
+**3. Tomorrow depends on today's fine particles.** The latest day's PM2.5 is known
+before its final AQI is (ozone is averaged past midnight). Using it cut one-day error
+by about 18%.
+
+**4. Wildfire smoke explains the extremes, and is the limit.** 15 of the 19 days
+above AQI 100 since 2020 had smoke reported at Pearson airport that day or the day
+before. Smoke arrives from hundreds of kilometres away, so local readings show it at
+most a day ahead.
+
+![2026 one-day forecasts against observed AQI](docs/images/forecast-vs-observed.png)
+
+**5. A smoke forecast is the next real gain.** Adding the European CAMS air-quality
+forecast cut back-test error further (9.6 against 11.1), but its archive only keeps
+near-term values, so that figure is an upper bound. It runs live as a challenger, and
+the refresh records real CAMS forecasts by lead time so honest evidence builds up.
 
 ## How it works
 
 ```text
-Federal (NAPS) + Ontario pollution data, Environment Canada weather
-                       │
-        Validated ETL → daily 4-pollutant AQI (EPA 2024 rules)
-                       │
-       Checksummed, locked research snapshot
-                       │
-  Compare models (2022–23) → tune (2024) → final test (2025)
-                       │
-     GitHub Actions: refresh data twice daily, issue a 7-day forecast
-                       │
-  Forecast ledger (data branch) → score once observations arrive
-                       │
-                Streamlit dashboard
+ Pollution (NAPS, Air Quality Ontario)      Weather (Environment Canada)
+ Weather forecasts by lead time, CAMS air-quality forecasts (Open-Meteo)
+                              │
+          Validated, checksummed, locked dataset
+                              │
+   Compare candidates (2024–25) → tune → freeze → test once (2026)
+                              │
+   Likely range · chance of AQI above 50 / 100 · flag cut-offs
+                              │
+   GitHub Actions, twice daily: refresh data, issue the outlook,
+   record it permanently, score earlier forecasts
+                              │
+                    Streamlit dashboard
 ```
 
 **Engineering highlights**
 
-- **No look-ahead leakage.** Features only use data available at forecast time,
-  including the one-day delay before the ozone part of the AQI is final. Missing
-  weather is filled using training data only, and tests check that changing future
-  values never changes a past forecast.
-- **Tested against baselines, in time order.** Five model types were compared with two
-  naive baselines on identical dates, using expanding yearly folds rather than random
-  splits; the chosen model was frozen before the final test year.
-- **Reproducible data.** A versioned data contract, SHA-256 checksums and source
-  manifests lock the research snapshot. Missing AQI is never filled in.
-- **Built for production.** Each forecast is recorded once and never overwritten; stale
-  or incomplete inputs block publication instead of reusing old data; every forecast
-  carries the model version that made it.
-- **Tested.** 66 unit and integration tests cover AQI calculation, leakage, scheduling
-  and the dashboard; CI also re-runs the notebook.
+- **No look-ahead leakage.** Every input is something known when the forecast is
+  issued, and the back-test uses the weather forecast as it stood 1–7 days earlier.
+  Tests check that changing future values never changes a past forecast.
+- **Honest selection.** Candidates are compared on later years in order, the winner
+  is frozen, and the test year is scored once. An input that cannot be verified from
+  archives (CAMS) is reported as an upper bound and cannot be selected.
+- **Reproducible.** The dataset is checksummed and locked; one command regenerates
+  every report byte for byte.
+- **Built for production.** Each forecast is recorded once and never overwritten,
+  unready inputs block publication instead of reusing old data, and each forecast
+  carries a model version that changes only when the model does.
+- **Tested.** 75 unit and integration tests; CI re-runs the pipeline and the notebook.
 
-## Project layout
-
-| Path | Purpose |
-| --- | --- |
-| [`AirQuality.ipynb`](AirQuality.ipynb) | The narrative: data, model choice, 2025 results, failures, latest forecast |
-| `aqi.py`, `aqi_data.py`, `data_sources.py`, `extend_data.py` | Download pollution and weather data; calculate daily AQI |
-| `etl_contract.py` | Validate and lock the prepared dataset |
-| `features.py`, `workflow.py` | Leak-free features; model comparison, tuning and the 2025 test |
-| `uncertainty.py` | 90% forecast ranges from recent errors (rolling conformal intervals) |
-| `explain.py` | What drives each horizon's forecast (permutation importance) |
-| `operations.py` | Scheduled refresh: issue, record and score forecasts |
-| `forecast_weather.py`, `weather_model.py` | Experimental challenger using weather forecasts |
-| `app.py`, `dashboard_data.py` | Streamlit dashboard |
-| `reports/` | Saved results: `workflow/`, `explain/`, `uncertainty/`, `weather/`, and a bundled `operational/` copy |
-| `data/processed/` | Locked, checksummed input data |
-| `tests/`, `scripts/` | Test suite; notebook runner used by CI |
-| `docs/` | Detailed methods (linked below) |
-
-## Run locally
+## Run it
 
 Python 3.11, from the repository root:
 
@@ -119,50 +131,70 @@ pip install -r requirements.txt
 
 ```bash
 streamlit run app.py                 # open the dashboard
+python -m airquality pipeline        # train, calibrate, score decisions, explain (~2 min)
 python -m unittest discover -s tests # run the test suite
 ```
 
-Reproduce the results (each command rewrites its `reports/` folder; outputs should
-match the committed files byte for byte):
+Everything goes through one entry point, `python -m airquality <command>`:
 
-```bash
-python workflow.py                   # model comparison, tuning and the 2025 test
-python explain.py                    # what drives the forecast
-python uncertainty.py                # 90% range calibration
-```
+| Command | What it does |
+| --- | --- |
+| `pipeline` | Runs `train`, `intervals`, `decisions` and `explain` in order |
+| `train` | Compares candidates, tunes and freezes the winner, tests it on 2026 |
+| `intervals` | Calibrates the 90% likely range |
+| `decisions` | Chances of exceeding AQI 50 and 100, flag cut-offs and their scores |
+| `explain` | Measures what each horizon's forecast relies on |
+| `data`, `lock` | Re-download the sources and rebuild the dataset; freeze it for modelling |
+| `refresh` | The scheduled job: issue today's outlook and score earlier ones |
+| `notebook` | Re-runs `AirQuality.ipynb` in place (needs `requirements-dev.txt`) |
 
-For the notebook, also run `pip install -r requirements-dev.txt`, then
-`jupyter lab AirQuality.ipynb` (or `python scripts/execute_notebook.py` to re-run it
-headless, as CI does). Live refreshes run in GitHub Actions; see
-[Operations](docs/operations.md).
+## Project layout
 
-## Limitations
+| Path | Purpose |
+| --- | --- |
+| [`AirQuality.ipynb`](AirQuality.ipynb) | The analysis: drivers of air quality, model choice, results, decisions. Reads saved results only |
+| `airquality/sources.py`, `naps_aqi.py`, `extend.py`, `aqi.py` | Download pollution and weather data; calculate the daily AQI |
+| `airquality/forecast_inputs.py` | Weather forecasts by lead time and CAMS air-quality forecasts |
+| `airquality/contract.py` | Validate and lock the dataset |
+| `airquality/features.py`, `training.py` | Leak-free inputs; candidate comparison, tuning and the test |
+| `airquality/uncertainty.py`, `decisions.py`, `explain.py` | Likely range; chances and flags; what the model relies on |
+| `airquality/operations.py` | Scheduled refresh: issue, record and score forecasts |
+| `app.py`, `airquality/dashboard_data.py` | Streamlit dashboard |
+| `data/processed/` | Locked dataset and forecast archives |
+| `reports/` | Saved results: `model/`, `uncertainty/`, `decisions/`, `explain/`, and a bundled copy of the live `operational/` ledger |
+| `tests/`, `docs/` | Test suite; guides and reference notes |
 
-- **Spikes and smoke.** The model misses sudden pollution spikes, especially
-  long-range wildfire smoke, which no local input can see.
-- **Single station.** Forecasts cover the Toronto West monitor, with weather from
-  Pearson airport about 8 km away. Recent Ontario readings are provisional.
+## Limits
+
+- **Smoke.** The outlook cannot see wildfire smoke coming more than a day ahead. In
+  wildfire season, no flag a few days out is not reassurance; follow official smoke
+  advisories.
+- **Few extreme days.** Only four days exceeded AQI 100 in the test year, so
+  statistics about them are indicative.
+- **One monitor.** Forecasts cover Toronto West, with weather from Pearson airport
+  about 8 km away. Recent Ontario readings are provisional.
 - **Not an official index.** The AQI is rebuilt with US EPA 2024 rules from four
-  pollutants (PM2.5, ozone, NO₂, SO₂). It is not Canada's AQHI or health advice.
-- **Live track record is still building.** The 2025 results are a historical test.
-  Live accuracy appears on the dashboard once each horizon has 30 scored forecasts.
-- **Ranges are estimates.** The 90% coverage is back-tested, not guaranteed; live
-  coverage is scored separately. The weather-forecast challenger is monitored on its
-  own and never replaces the main model automatically.
+  pollutants. It is not Canada's AQHI or health advice.
+- **Live record is still short.** The 2026 results are a back-test. Live accuracy
+  appears on the dashboard once each horizon has 30 scored forecasts.
 
 ## Documentation
 
-[Evaluation protocol](docs/workflow.md) · [Data & AQI calculation](docs/data.md) ·
-[Data contract](docs/etl_contract.md) · [Data sources](docs/extended_data.md) ·
-[Source comparison](docs/source_comparison.md) · [Operations](docs/operations.md) ·
-[Dashboard](docs/dashboard.md)
+- [Data](docs/data.md): sources, what is collected and how to rebuild it
+- [Modelling](docs/modelling.md): candidates, selection protocol, results, decisions
+- [Operations](docs/operations.md): the scheduled refresh, the forecast ledger, deploying the dashboard
+- Reference: [AQI calculation](docs/reference/aqi_calculation.md) ·
+  [data contract](docs/reference/data_contract.md) ·
+  [Ontario extension](docs/reference/ontario_extension.md) ·
+  [source comparison](docs/reference/source_comparison.md)
 
 **Data:** pollution (NAPS) and weather data from Environment and Climate Change Canada,
 under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada);
 2025-onward pollution data from the Government of Ontario
 ([Air Quality Ontario](https://www.airqualityontario.com/), subject to its
 [terms and disclaimer](https://www.airqualityontario.com/science/disclaimer.php));
-forecast weather from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0).
+weather and air-quality forecasts from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0),
+including CAMS data from the Copernicus Atmosphere Monitoring Service.
 
 **Licence:** code under the [MIT License](LICENSE); data remains under its sources' terms.
 

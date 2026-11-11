@@ -1,9 +1,9 @@
-"""What drives the selected model: grouped permutation importance on the 2025 hold-out.
+"""What the selected model relies on: grouped permutation importance on the test year.
 
-For each horizon the selected configuration is fitted through 2024 (as in the final
-evaluation) and scored on 2025. Each input group is then shuffled across 2025 rows,
-and the increase in MAE measures how much the forecast relies on that input. The
-two seasonal terms are shuffled together so time of year counts as one input.
+For each horizon the selected configuration is fitted on the years before the test
+year and scored on it. Each group of related inputs is then shuffled across the test
+rows, and the rise in average error measures how much the forecast leans on that
+group. It describes reliance, not cause.
 """
 
 import json

@@ -1,6 +1,6 @@
 # Concatenated observations from 2020 onward
 
-`python extend_data.py` downloads Toronto West Ontario CSV exports for all four
+`python -m airquality data` downloads Toronto West Ontario CSV exports for all four
 pollutants, starting on January 1, 2020 and ending today in fixed EST. The export
 endpoint supports 2026 observations even though the historical search form currently
 limits its date picker to 2025. A requested NAPS 2025 PM2.5 file returned 404 during
