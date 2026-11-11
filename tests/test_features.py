@@ -7,9 +7,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from data_sources import WEATHER_FIELDS
-from features import load_data, make_features
-from workflow import fit
+from airquality.sources import WEATHER_FIELDS
+from airquality.features import load_data, make_features
+from airquality.training import fit
 
 
 def fixture():
@@ -20,6 +20,13 @@ def fixture():
     )
     for i, name in enumerate(WEATHER_FIELDS):
         frame[name] = np.arange(n) / 10 + i
+    # Same-day pollutant readings used by the richer feature sets.
+    for i, name in enumerate(
+        ("PM25_AQI", "PM25_max_1h", "O3_max_1h", "NO2_max_1h", "PM25_evening")
+    ):
+        frame[name] = 10 + np.cos(np.arange(n) / (3 + i)) * 4
+    for name in ("O3_afternoon", "O3_AQI", "NO2_AQI"):
+        frame[name] = 20 + np.sin(np.arange(n) / 5) * 3
     frame["naps_station_id"] = "060430"
     frame["climate_station_id"] = "6158731"
     return frame
@@ -42,8 +49,9 @@ class ForecastTests(unittest.TestCase):
         frame = fixture()
         end = frame.index[-21]
         frame.loc[frame.index > end, "temperature_c"] = 10000
-        config = {"name": "forest_weather_5", "family": "forest_weather", "leaf": 5}
-        model, features, columns, eligible, _, _ = fit(frame, end, 7, config)
+        config = {"name": "ridge", "family": "ridge", "alpha": 1.0}
+        model, features, eligible, _, _ = fit(frame, end, 7, config)
+        columns = features.columns.tolist()
         # AQI labels become available one day late, so day D trains only if D+1 <= end.
         mask = (
             eligible

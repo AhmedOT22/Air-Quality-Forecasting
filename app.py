@@ -1,12 +1,13 @@
-"""Toronto AQI Observatory: read-only forecasts, observations and model evidence."""
+"""Toronto air-quality outlook: forecasts, the chance of a poor-air day, and the evidence."""
 
+import json
 import os
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from aqi import category
-from dashboard_data import (
+from airquality.aqi import category
+from airquality.dashboard_data import (
     ROOT,
     MODEL_LABELS,
     load_bundle,
@@ -16,6 +17,22 @@ from dashboard_data import (
 )
 
 MIN_LIVE_PAIRS = 30
+RELEASE = json.loads((ROOT / "reports/model/run.json").read_text())
+PRIMARY = RELEASE["selected_config"]["name"]
+CHALLENGER = "boosting_forecast_cams"
+DECISIONS = json.loads((ROOT / "reports/decisions/summary.json").read_text())
+CUTOFFS = DECISIONS["alert_cutoffs"]
+MODEL_LABELS = {**MODEL_LABELS, PRIMARY: "Primary model"}
+
+
+def advice(row):
+    """Plain-language guidance from the two exceedance probabilities."""
+    if row.get("p_unhealthy_sensitive", 0) >= CUTOFFS["unhealthy_sensitive"]:
+        return "Unhealthy-air alert: sensitive groups should plan to stay indoors"
+    if row.get("p_moderate", 0) >= CUTOFFS["moderate"]:
+        return "Heads-up: air may be Moderate; sensitive people take it easier"
+    return "Good day for outdoor plans"
+
 
 st.set_page_config(
     page_title="Toronto AQI Observatory",
@@ -165,10 +182,10 @@ with st.sidebar:
     st.divider()
     horizon = st.slider("Days to display", min_value=1, max_value=7, value=7)
     show_interval = st.toggle("Show uncertainty band", value=True)
-    show_challenger = st.toggle("Compare weather-aware model", value=False)
+    show_challenger = st.toggle("Compare smoke-aware challenger", value=False)
     st.divider()
     st.caption(
-        "Toronto West · 125 Resources Road\n\nEPA 2024 · four-pollutant reconstruction\n\nPrimary model · Ridge, alpha 1"
+        "Toronto West · 125 Resources Road\n\nEPA 2024 · four-pollutant reconstruction\n\nPrimary model · gradient boosting with weather forecasts"
     )
     st.link_button(
         "Source code & methodology",
@@ -204,14 +221,21 @@ for warning in bundle["warnings"]:
     st.warning(warning)
 
 forecast = bundle["forecast"]
+primary_name = PRIMARY
+if not forecast.model.eq(PRIMARY).any():
+    # A ledger published before the current model release: show what it holds.
+    primary_name = forecast.model.loc[~forecast.model.eq(CHALLENGER)].iloc[0]
+    st.warning(
+        "The published forecast predates the current model release; "
+        "showing the earlier model until the next refresh."
+    )
 primary = (
-    forecast.loc[forecast.model.eq("ridge_1")].sort_values("horizon").head(horizon)
+    forecast.loc[forecast.model.eq(primary_name)].sort_values("horizon").head(horizon)
 )
 challenger = (
-    forecast.loc[forecast.model.eq("ridge_forecast_weather_1")]
-    .sort_values("horizon")
-    .head(horizon)
+    forecast.loc[forecast.model.eq(CHALLENGER)].sort_values("horizon").head(horizon)
 )
+has_chance = "p_moderate" in primary and primary.p_moderate.notna().all()
 if primary.empty:
     st.error("The primary forecast is unavailable.")
     st.stop()
@@ -234,21 +258,31 @@ b.metric(
     f"{peak.Date:%a, %b %d}",
     delta_color="off",
 )
-c.metric(
-    "Forecast origin",
-    f"{next_row.origin:%b %d}",
-    f"{next_row.origin:%Y} · completed EST day",
-    delta_color="off",
-)
-d.metric(
-    "Prospective outcomes",
-    f"{scored:,}",
-    "Collecting observations" if scored == 0 else "Model / horizon pairs",
-    delta_color="off",
-)
+if has_chance:
+    flagged = primary.apply(advice, axis=1).ne("Good day for outdoor plans")
+    c.metric(
+        f"Chance of Moderate or worse · {next_row.Date:%b %d}",
+        f"{next_row.p_moderate:.0%}",
+        "AQI above 50",
+        delta_color="off",
+    )
+    d.metric(
+        "Days flagged in this outlook",
+        f"{int(flagged.sum())} of {len(primary)}",
+        "Heads-up or alert",
+        delta_color="off",
+    )
+else:
+    c.metric(
+        "Forecast made after",
+        f"{next_row.origin:%b %d}",
+        f"{next_row.origin:%Y} · last complete day",
+        delta_color="off",
+    )
+    d.metric("Forecasts scored so far", f"{scored:,}", "Live record", delta_color="off")
 
 outlook, observations, performance, method = st.tabs(
-    ["Forecast outlook", "Observed history", "Performance", "About the model"]
+    ["Outlook", "Observed history", "How reliable is it?", "About the model"]
 )
 with outlook:
     st.subheader(
@@ -257,18 +291,12 @@ with outlook:
         else "Published forecast snapshot"
     )
     st.caption(
-        "Solid green: retained Ridge model. Shading: rolling conformal 90% interval. Vertical line: last completed forecast origin."
+        f"Green line: forecast made after {next_row.origin:%b %d}. Shading: the range the real value should fall in 9 days out of 10. Dashed line: last complete day of data."
     )
     st.plotly_chart(
         forecast_chart(primary, challenger, observed, show_interval, show_challenger),
         width="stretch",
         config={"displayModeBar": False},
-    )
-    coverage = pd.read_csv(ROOT / "reports/uncertainty/calibration.csv")
-    st.info(
-        "Shaded band: rolling conformal 90% interval, set each run from the last 180 days of "
-        f"forecast errors. In 2026 back-testing it covered {coverage.observed_coverage.min():.0%}–"
-        f"{coverage.observed_coverage.max():.0%} of outcomes by horizon; live coverage is not guaranteed."
     )
     left, right = st.columns([2, 1])
     with left:
@@ -276,22 +304,35 @@ with outlook:
         table["Category"] = table.predicted_AQI.map(
             lambda v: category(int(np.floor(v + 0.5)))
         )
-        if show_interval and {"lower_AQI", "upper_AQI"} <= set(primary):
-            table["Lower estimate"] = primary.lower_AQI.to_numpy()
-            table["Upper estimate"] = primary.upper_AQI.to_numpy()
-        table = table.rename(
-            columns={"Date": "Forecast date", "predicted_AQI": "Predicted AQI"}
-        )
+        if {"lower_AQI", "upper_AQI"} <= set(primary):
+            table["Likely range"] = [
+                f"{low:.0f}–{high:.0f}"
+                for low, high in zip(primary.lower_AQI, primary.upper_AQI)
+            ]
+        if has_chance:
+            table["Chance above 50"] = primary.p_moderate.to_numpy()
+            table["Chance above 100"] = primary.p_unhealthy_sensitive.to_numpy()
+            table["What to do"] = primary.apply(advice, axis=1).to_numpy()
+        table = table.rename(columns={"Date": "Day", "predicted_AQI": "Forecast AQI"})
         st.dataframe(
             table,
             hide_index=True,
             width="stretch",
             column_config={
-                "Predicted AQI": st.column_config.NumberColumn(format="%.1f"),
-                "Lower estimate": st.column_config.NumberColumn(format="%.1f"),
-                "Upper estimate": st.column_config.NumberColumn(format="%.1f"),
-                "Forecast date": st.column_config.DateColumn(format="ddd, MMM D"),
+                "Forecast AQI": st.column_config.NumberColumn(format="%.0f"),
+                "Chance above 50": st.column_config.ProgressColumn(
+                    format="percent", min_value=0, max_value=1
+                ),
+                "Chance above 100": st.column_config.NumberColumn(format="percent"),
+                "Day": st.column_config.DateColumn(format="ddd, MMM D"),
             },
+        )
+        coverage = pd.read_csv(ROOT / "reports/uncertainty/calibration.csv")
+        st.caption(
+            f"A day is flagged when the chance of AQI above 50 reaches {CUTOFFS['moderate']:.0%}, "
+            f"or above 100 reaches {CUTOFFS['unhealthy_sensitive']:.0%}. In 2026 back-testing the "
+            f"likely range held {coverage.observed_coverage.min():.0%}–{coverage.observed_coverage.max():.0%} "
+            "of outcomes. Sudden wildfire smoke can arrive with little warning."
         )
     with right:
         st.markdown("**Read the outlook**")
@@ -311,13 +352,6 @@ with outlook:
         st.warning(
             "The experimental challenger is unavailable for this issuance. The primary forecast is retained."
         )
-    weather = bundle.get("weather", pd.DataFrame())
-    if not weather.empty:
-        with st.expander("Forecast weather at Pearson"):
-            st.dataframe(weather.head(horizon), hide_index=True, width="stretch")
-            st.caption(
-                "Forecast temperature (°C), humidity (%), wind (km/h), pressure (kPa). Open-Meteo.com, CC BY 4.0. Forecast values are distinct from observed weather."
-            )
 with observations:
     st.subheader("How air quality has changed")
     st.caption(
@@ -393,8 +427,8 @@ with performance:
             )
             fig = go.Figure()
             for name, color in [
-                ("ridge_1", "#167466"),
-                ("ridge_forecast_weather_1", "#ca8a33"),
+                (PRIMARY, "#167466"),
+                (CHALLENGER, "#ca8a33"),
             ]:
                 values = mature.loc[mature.model.eq(name)].sort_values("horizon")
                 if values.empty:
@@ -448,51 +482,101 @@ with performance:
             f"{MODEL_LABELS.get(alert['model'], alert['model'])} · horizon {alert['horizon']}: {alert['reason'].replace('_', ' ')}"
         )
     st.divider()
-    st.markdown("**Retrospective evaluation · 2025**")
+    st.markdown(f"**Back-test on {RELEASE['test_year']}, a year the model never saw**")
     st.caption(
-        "Model selection used earlier years. These historical results are separate from prospective scores. Errors use identical eligible dates within each horizon."
+        "The model was chosen on 2024–2025 and then scored once on "
+        f"{RELEASE['test_year']}. Every model is scored on the same days."
     )
-    backtest = pd.read_csv(ROOT / "reports/workflow/test_metrics.csv")
+    backtest = pd.read_csv(ROOT / "reports/model/test_metrics.csv")
     fig = go.Figure()
-    for model, group in backtest.groupby("model"):
+    for model, label, color, dash in [
+        (PRIMARY, "This model", "#167466", "solid"),
+        ("ridge_history", "Previous model", "#81959e", "solid"),
+        ("persistence", "Naive: same as latest day", "#ca8a33", "solid"),
+        (CHALLENGER, "With CAMS smoke forecast (upper bound)", "#167466", "dot"),
+    ]:
+        group = backtest.loc[backtest.model.eq(model)]
         fig.add_trace(
             go.Scatter(
                 x=group.horizon,
                 y=group.MAE,
-                name={
-                    "ridge_1": "Primary Ridge",
-                    "persistence": "Persistence",
-                    "weekly": "Weekly baseline",
-                }.get(model, model),
+                name=label,
                 mode="lines+markers",
+                line=dict(color=color, dash=dash, width=3 if model == PRIMARY else 2),
+                hovertemplate="%{y:.1f} AQI points<extra>%{fullData.name}</extra>",
             )
         )
     fig.update_layout(legend=dict(orientation="h"))
-    fig.update_xaxes(title="Forecast horizon (days)", dtick=1)
-    fig.update_yaxes(title="MAE · AQI points")
+    fig.update_xaxes(title="Days ahead", dtick=1)
+    fig.update_yaxes(title="Average error · AQI points", rangemode="tozero")
     st.plotly_chart(
-        style_chart(fig, 320), width="stretch", config={"displayModeBar": False}
+        style_chart(fig, 340), width="stretch", config={"displayModeBar": False}
     )
-    with st.expander("See evaluation counts and interval coverage"):
-        st.dataframe(backtest, hide_index=True, width="stretch")
+    st.markdown("**How good are the flags?**")
+    alert_scores = pd.read_csv(ROOT / "reports/decisions/alerts.csv")
+    chosen = alert_scores.loc[
+        alert_scores.chosen & alert_scores.year.eq(DECISIONS["evaluation_year"])
+    ]
+    moderate = chosen.loc[chosen.event.eq("moderate")]
+    spikes = chosen.loc[chosen.event.eq("unhealthy_sensitive")]
+    left, right = st.columns(2)
+    left.metric(
+        "Moderate-or-worse days flagged in advance",
+        f"{moderate.hits.sum() / moderate.event_days.sum():.0%}",
+        f"{moderate.hits.sum() / moderate.alerts.sum():.0%} of flags were right",
+        delta_color="off",
+    )
+    day_one = spikes.loc[spikes.horizon.eq(1)].iloc[0]
+    right.metric(
+        "Days above 100 flagged one day ahead",
+        f"{day_one.hits} of {day_one.event_days}",
+        f"{int(spikes.loc[spikes.horizon.gt(1), 'hits'].sum())} flagged two or more days ahead",
+        delta_color="off",
+    )
+    st.caption(
+        f"{DECISIONS['evaluation_year']} back-test, all horizons pooled for the first figure. "
+        "Flags catch most Moderate days at the cost of false alarms; days above 100 are "
+        "rare and are only caught the day before, because smoke arrives suddenly."
+    )
+    with st.expander("Scores by days ahead"):
+        st.dataframe(
+            moderate[
+                [
+                    "horizon",
+                    "event_days",
+                    "hits",
+                    "misses",
+                    "false_alarms",
+                    "recall",
+                    "precision",
+                ]
+            ].rename(
+                columns={
+                    "horizon": "Days ahead",
+                    "event_days": "Days above 50",
+                    "hits": "Flagged",
+                    "misses": "Missed",
+                    "false_alarms": "False alarms",
+                    "recall": "Share caught",
+                    "precision": "Share of flags right",
+                }
+            ),
+            hide_index=True,
+            width="stretch",
+            column_config={
+                "Share caught": st.column_config.NumberColumn(format="percent"),
+                "Share of flags right": st.column_config.NumberColumn(format="percent"),
+            },
+        )
         st.dataframe(
             pd.read_csv(ROOT / "reports/uncertainty/calibration.csv"),
             hide_index=True,
             width="stretch",
         )
-    with st.expander("Forecast-weather challenger · exploratory 2026 comparison"):
-        st.dataframe(
-            pd.read_csv(ROOT / "reports/weather/comparison.csv"),
-            hide_index=True,
-            width="stretch",
-        )
-        st.caption(
-            "Archived lead-specific forecasts are proxies for original issuance-time weather. This is exploratory evidence; there is no automatic promotion."
-        )
 with method:
     st.subheader("From observations to an upcoming forecast")
     st.markdown(
-        "**01 · Observe**  NAPS Toronto West history from 2020, extended with Ontario observations and ECCC Pearson weather.\n\n**02 · Prepare**  Fixed-EST hourly alignment, strict coverage, all four pollutants required, no imputed AQI targets.\n\n**03 · Forecast**  Ridge regression, alpha 1, one model per horizon. Available AQI lags, seasonal terms and completed-day weather.\n\n**04 · Verify**  First-issued forecasts are preserved and later compared with observed AQI. Stale or incomplete refreshes block new issuance."
+        "**01 · Observe**  NAPS Toronto West history from 2020, extended with Ontario observations and ECCC Pearson weather.\n\n**02 · Prepare**  Fixed-EST hourly alignment, strict coverage, all four pollutants required, no imputed AQI targets.\n\n**03 · Forecast**  Gradient boosting, one model per day ahead. Inputs: the latest pollutant readings, AQI history, time of year and the weather forecast for the day being predicted. Each forecast carries a likely range and the chance of exceeding AQI 50 and 100.\n\n**04 · Verify**  First-issued forecasts are preserved and later compared with observed AQI. Stale or incomplete refreshes block new issuance."
     )
     st.markdown("**What drives the forecast**")
     drivers = pd.read_csv(ROOT / "reports/explain/importance.csv")
@@ -522,9 +606,8 @@ with method:
         style_chart(fig, 380), width="stretch", config={"displayModeBar": False}
     )
     st.caption(
-        f"Permutation importance on 2025 for a model fitted through 2024 (baseline error {view.baseline_MAE.iloc[0]:.1f} AQI points). "
-        "Longer bars mean the forecast leans harder on that input. AQI lags are correlated, so each one alone "
-        "understates how much the model relies on recent AQI as a whole. This shows reliance, not cause."
+        f"Measured on {RELEASE['test_year']} for a model fitted on earlier years (baseline error {view.baseline_MAE.iloc[0]:.1f} AQI points). "
+        "Longer bars mean the forecast leans harder on that input. This shows reliance, not cause."
     )
     with st.expander("Importance by horizon · table"):
         st.dataframe(

@@ -1,0 +1,35 @@
+{
+  "thresholds": {
+    "moderate": 50,
+    "unhealthy_sensitive": 100
+  },
+  "alert_cutoffs": {
+    "moderate": 0.2,
+    "unhealthy_sensitive": 0.1
+  },
+  "cutoff_rule": "On 2025, the highest-precision cut-off that catches at least 70% of event days, pooled over horizons",
+  "evaluation_year": 2026,
+  "pooled_alert_results": {
+    "moderate": {
+      "event_days": 404,
+      "hits": 330,
+      "misses": 74,
+      "false_alarms": 570
+    },
+    "unhealthy_sensitive": {
+      "event_days": 28,
+      "hits": 3,
+      "misses": 25,
+      "false_alarms": 0
+    }
+  },
+  "climatology": {
+    "moderate": 0.31218781218781216,
+    "unhealthy_sensitive": 0.0
+  },
+  "method": "Share of signed errors in the trailing 180 days that push the forecast above the threshold",
+  "limitations": [
+    "Days above 100 are rare, so their alert statistics rest on a handful of days and are indicative only",
+    "Probabilities assume recent errors resemble the next one; sudden smoke events break that assumption"
+  ]
+}

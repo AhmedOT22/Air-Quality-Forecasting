@@ -2,22 +2,23 @@
   "dataset_lock": {
     "contract_version": 1,
     "input": "daily_aqi_latest.csv",
-    "input_sha256": "05ace9b4186bc84202a06fd84296d0f1478638d0785463afe4d80dbad0428aed",
-    "manifest_sha256": "004e8831bd3c45660bae697ef9982d1a890a0335a6b75fca45492ced6b30f7ca",
-    "hourly_sha256": "e5e5c5b1be938ea5db4e8ae0b84228d5fa674b5261cffa7daa59ae3d6337798a",
+    "input_sha256": "95c2dd6d2f65233cad94382a3a73d2a9d2bb5766c947b9bc7d05c6df83d19b5b",
+    "manifest_sha256": "be0da81c848b6340322fd7c611749491b2a40c9d4a6e6a776c69a3b0d934e655",
+    "hourly_sha256": "83f8d703e0a9e41d958893d4ae811d911dde9b05cfd80ab1623beeb41619f83a",
     "standard": "epa_2024",
     "start": "2020-01-01",
-    "end": "2026-10-30"
+    "end": "2026-11-10"
   },
   "config": {
-    "name": "ridge_1",
-    "family": "ridge",
-    "alpha": 1.0
+    "family": "boosting",
+    "features": "forecast",
+    "name": "boosting_forecast_leaf10",
+    "leaf": 10
   },
   "method": "Rolling split conformal: finite-sample 90% quantile of absolute out-of-sample errors in the trailing 180 days, per horizon; lower bound at zero",
-  "residual_stream": "Yearly chronological refits 2023-2026 (fit through the prior year)",
-  "window_selection": "2025 only; candidates [90, 180, 365, 730] days",
-  "held_out_evaluation": "2026-01-01/2026-10-30",
+  "residual_stream": "Yearly chronological refits 2024-2026 (fit through the prior year)",
+  "window_selection": "2025 only; candidates [90, 180, 365] days",
+  "held_out_evaluation": "2026-01-01/2026-11-10",
   "operational": "Each refresh recomputes widths from the trailing window, adding scored live forecasts to the retrospective stream",
   "limitations": [
     "Serial dependence and nonstationarity rule out a guaranteed coverage; the window adapts, it does not certify",

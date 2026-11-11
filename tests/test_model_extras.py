@@ -6,21 +6,26 @@ import unittest.mock
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from explain import groups, importance
+from airquality.explain import groups, importance
 from tests.test_features import fixture
-from uncertainty import (
+from airquality.uncertainty import (
     MIN_RESIDUALS,
     load_residuals,
     trailing_widths,
     window_errors,
 )
-from workflow import CANDIDATES, evaluate, tuning_grid
+from airquality.training import CANDIDATES, evaluate, tuning_grid
 
 
 def residuals(start="2026-01-01", days=400, error=None):
     dates = pd.date_range(start, periods=days)
     rows = [
-        {"Date": d, "horizon": h, "abs_error": float(i if error is None else error)}
+        {
+            "Date": d,
+            "horizon": h,
+            "error": float(i if error is None else error),
+            "abs_error": float(i if error is None else error),
+        }
         for h in range(1, 8)
         for i, d in enumerate(dates)
     ]
@@ -84,6 +89,8 @@ class RollingConformalTests(unittest.TestCase):
                     "horizon": [1, 1, 1],
                     "model": ["ridge_1", "ridge_1", "other"],
                     "model_abs_error": [50.0, 60.0, 999.0],
+                    "actual_first": [80.0, 90.0, 0.0],
+                    "predicted_AQI": [30.0, 30.0, 999.0],
                 }
             ).to_csv(root / "scores.csv", index=False)
             pool = load_residuals(root, "ridge_1", root)
@@ -96,17 +103,26 @@ class RollingConformalTests(unittest.TestCase):
 
 class ExplanationTests(unittest.TestCase):
     def test_seasonal_terms_are_shuffled_as_one_input(self):
-        grouped = groups(["aqi_lag_0", "target_day_sin", "target_day_cos", "wind"])
+        grouped = groups(
+            ["aqi_lag_0", "target_day_sin", "target_day_cos", "cams_pm25", "cams_aod"]
+        )
         self.assertEqual(grouped["season"], ["target_day_sin", "target_day_cos"])
+        self.assertEqual(grouped["cams"], ["cams_pm25", "cams_aod"])
         self.assertEqual(len(grouped), 3)
 
     def test_importance_flags_the_input_the_model_uses(self):
         frame = fixture()
         frame.index = pd.date_range("2024-09-01", periods=len(frame), name="Date")
-        with unittest.mock.patch("explain.FIT_END", "2024-12-15"):
+        with (
+            unittest.mock.patch("airquality.explain.FIT_END", "2024-12-15"),
+            unittest.mock.patch("airquality.explain.TEST_END", "2025-12-31"),
+        ):
             rows = pd.DataFrame(
                 importance(
-                    frame, {"name": "r", "family": "ridge", "alpha": 1.0}, 1, repeats=5
+                    frame,
+                    {"name": "r", "family": "ridge", "alpha": 1.0},
+                    1,
+                    repeats=5,
                 )
             )
         self.assertEqual(rows.n.nunique(), 1)

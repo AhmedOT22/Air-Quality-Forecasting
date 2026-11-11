@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from data_sources import (
+from airquality.sources import (
     WEATHER_FIELDS,
     download,
     naps_daily,
@@ -115,7 +115,7 @@ class SourceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "source.csv"
             path.write_bytes(b"observed data")
-            with patch("data_sources.urlopen") as network:
+            with patch("airquality.sources.urlopen") as network:
                 _, record = download("https://example.com/source", path)
                 network.assert_not_called()
                 self.assertIsNone(record["downloaded_at"])

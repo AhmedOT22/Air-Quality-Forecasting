@@ -5,7 +5,7 @@ import json
 import unittest
 from pathlib import Path
 
-from features import load_data
+from airquality.features import load_data
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -52,7 +52,7 @@ class SnapshotTests(unittest.TestCase):
         )
         self.assertEqual(int(data.AQI.notna().sum()), metadata["observed_target_days"])
         self.assertEqual(metadata["aqi_availability_delay_days"], 1)
-        from aqi import DEFAULT_STANDARD, category, pm25_index
+        from airquality.aqi import DEFAULT_STANDARD, category, pm25_index
 
         self.assertEqual(metadata["standard"], DEFAULT_STANDARD)
         self.assertTrue(data.aqi_standard.eq(DEFAULT_STANDARD).all())

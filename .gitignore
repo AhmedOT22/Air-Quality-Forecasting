@@ -14,3 +14,6 @@ data/processed/*
 !data/processed/daily_aqi_latest.manifest.json
 !data/processed/daily_aqi_latest.lock.json
 !data/processed/hourly_pollution_2020_latest.csv.gz
+!data/processed/forecast_weather.csv
+!data/processed/cams_daily.csv
+!data/processed/forecast_inputs.manifest.json

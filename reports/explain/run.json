@@ -2,21 +2,22 @@
   "dataset_lock": {
     "contract_version": 1,
     "input": "daily_aqi_latest.csv",
-    "input_sha256": "05ace9b4186bc84202a06fd84296d0f1478638d0785463afe4d80dbad0428aed",
-    "manifest_sha256": "004e8831bd3c45660bae697ef9982d1a890a0335a6b75fca45492ced6b30f7ca",
-    "hourly_sha256": "e5e5c5b1be938ea5db4e8ae0b84228d5fa674b5261cffa7daa59ae3d6337798a",
+    "input_sha256": "95c2dd6d2f65233cad94382a3a73d2a9d2bb5766c947b9bc7d05c6df83d19b5b",
+    "manifest_sha256": "be0da81c848b6340322fd7c611749491b2a40c9d4a6e6a776c69a3b0d934e655",
+    "hourly_sha256": "83f8d703e0a9e41d958893d4ae811d911dde9b05cfd80ab1623beeb41619f83a",
     "standard": "epa_2024",
     "start": "2020-01-01",
-    "end": "2026-10-30"
+    "end": "2026-11-10"
   },
   "config": {
-    "name": "ridge_1",
-    "family": "ridge",
-    "alpha": 1.0
+    "family": "boosting",
+    "features": "forecast",
+    "name": "boosting_forecast_leaf10",
+    "leaf": 10
   },
-  "fit_end": "2024-12-31",
-  "evaluation": "2025-01-01/2025-12-31",
-  "method": "Grouped permutation importance: mean MAE increase over 30 shuffles per input group; seasonal sine/cosine shuffled jointly",
+  "fit_end": "2025-12-31",
+  "evaluation": "2025-12-31 onward (the test year)",
+  "method": "Grouped permutation importance: mean MAE increase over 30 shuffles per input group; related inputs shuffled jointly",
   "limitations": [
     "Correlated inputs share credit: shuffling one AQI lag leaves the others, so each lag alone looks less important than AQI history as a whole",
     "Importance describes reliance of this fitted model on 2025 data, not causal effects on air quality"

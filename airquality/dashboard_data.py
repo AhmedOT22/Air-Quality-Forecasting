@@ -1,0 +1,233 @@
+"""Read-only dashboard data access and presentation rules, independent of Streamlit."""
+
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+import io
+import json
+from pathlib import Path
+from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
+import numpy as np
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY = "AhmedOT22/Air-Quality-Forecasting"
+# The scheduled refresh publishes the operational ledger to this branch, keeping
+# automated commits out of main. main is the fallback before the branch exists.
+PUBLISHED_BRANCHES = ("data", "main")
+FILES = {
+    "status": "status.json",
+    "forecast": "latest_forecast.csv",
+    "manifest": "latest_manifest.json",
+    "metrics": "metrics.csv",
+    "rolling": "rolling_metrics.csv",
+    "scores": "scores.csv",
+    "observations": "observation_history.csv",
+    "alerts": "alerts.json",
+}
+REQUIRED = {"status", "forecast", "manifest"}
+MODEL_LABELS = {
+    "boosting_forecast_cams": "Smoke-aware challenger (CAMS)",
+    "ridge_1": "Previous model (Ridge)",
+    "ridge_forecast_weather_1": "Previous weather-aware challenger",
+}
+
+
+def request(url):
+    with urlopen(
+        Request(url, headers={"User-Agent": "TorontoAQIDashboard/1.0"}), timeout=12
+    ) as response:
+        return response.read()
+
+
+def decode(content, filename):
+    if filename.endswith(".json"):
+        return json.loads(content)
+    return pd.read_csv(io.BytesIO(content))
+
+
+def validate_bundle(bundle):
+    frame = bundle["forecast"]
+    required = {"origin", "Date", "model", "predicted_AQI", "horizon"}
+    if frame.empty or not required <= set(frame):
+        raise ValueError("Forecast report is empty or missing required fields")
+    frame = frame.copy()
+    # A model release can create a new immutable issuance for the same origin.
+    # Display its newest version; reject duplicates within that version.
+    if {"model_id", "issued_at"} <= set(frame):
+        order = frame.assign(
+            _issued=pd.to_datetime(
+                frame.issued_at, utc=True, format="ISO8601", errors="raise"
+            )
+        )
+        versions = (
+            order.sort_values("_issued")
+            .groupby("model")
+            .tail(1)
+            .set_index("model")
+            .model_id
+        )
+        frame = frame.loc[frame.model_id.eq(frame.model.map(versions))].copy()
+    for name in ["origin", "Date"]:
+        frame[name] = pd.to_datetime(frame[name], errors="raise")
+    if (frame.Date <= frame.origin).any() or frame.duplicated(["model", "Date"]).any():
+        raise ValueError("Invalid or duplicate forecast dates")
+    predictions = pd.to_numeric(frame.predicted_AQI, errors="raise")
+    if not (np.isfinite(predictions) & predictions.ge(0)).all():
+        raise ValueError("Invalid AQI predictions")
+    frame["predicted_AQI"] = predictions
+    horizons = pd.to_numeric(frame.horizon, errors="raise")
+    if (
+        not horizons.isin(range(1, 8)).all()
+        or not (frame.Date - frame.origin).eq(pd.to_timedelta(horizons, unit="D")).all()
+    ):
+        raise ValueError("Forecast horizons must match their target dates")
+    if (
+        not frame.groupby("model")
+        .horizon.apply(lambda values: set(values) == set(range(1, 8)))
+        .all()
+    ):
+        raise ValueError(
+            "Each published model must contain all seven forecast horizons"
+        )
+    if frame.origin.nunique() != 1:
+        raise ValueError("Forecast report mixes issuance origins")
+    if (
+        bundle["status"].get("origin")
+        and str(frame.origin.iloc[0].date()) != bundle["status"]["origin"]
+    ):
+        raise ValueError("Forecast and status origins disagree")
+    bundle["forecast"] = frame
+    return bundle
+
+
+def local_bundle(root=ROOT):
+    result = {}
+    warnings = []
+    for key, name in FILES.items():
+        path = Path(root) / "reports/operational" / name
+        try:
+            result[key] = decode(path.read_bytes(), name)
+        except (OSError, ValueError) as error:
+            if key in REQUIRED:
+                raise ValueError(f"Cannot read {name}: {error}") from error
+            warnings.append(f"{name} is unavailable")
+    result.update(
+        source="Bundled snapshot", revision="local checkout", warnings=warnings
+    )
+    return validate_bundle(result)
+
+
+def published_bundle():
+    for branch in PUBLISHED_BRANCHES:
+        try:
+            ref = json.loads(
+                request(
+                    f"https://api.github.com/repos/{REPOSITORY}/git/ref/heads/{branch}"
+                )
+            )
+            break
+        except OSError:
+            if branch == PUBLISHED_BRANCHES[-1]:
+                raise
+    sha = ref["object"]["sha"]
+
+    def read(item):
+        key, name = item
+        try:
+            return (
+                key,
+                decode(
+                    request(
+                        f"https://raw.githubusercontent.com/{REPOSITORY}/{sha}/reports/operational/{name}"
+                    ),
+                    name,
+                ),
+                None,
+            )
+        except (OSError, ValueError) as error:
+            return key, None, str(error)
+
+    result = {}
+    warnings = []
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        for key, value, error in pool.map(read, FILES.items()):
+            if error:
+                if key in REQUIRED:
+                    raise ValueError(f"Published {FILES[key]} unavailable: {error}")
+                warnings.append(f"{FILES[key]} is unavailable")
+            else:
+                result[key] = value
+    result.update(source="Latest published reports", revision=sha, warnings=warnings)
+    return validate_bundle(result)
+
+
+def load_bundle(published=True):
+    if not published:
+        return local_bundle()
+    try:
+        return published_bundle()
+    except (OSError, ValueError, KeyError) as error:
+        result = local_bundle()
+        result["warnings"].insert(
+            0,
+            f"Could not retrieve published reports; showing the bundled snapshot. {error}",
+        )
+        return result
+
+
+def freshness(bundle, now=None):
+    now = pd.Timestamp(now or datetime.now(timezone.utc))
+    if now.tzinfo is None:
+        raise ValueError("Current time must be timezone-aware")
+    now = now.tz_convert("UTC")
+    stamp = pd.to_datetime(
+        bundle["status"].get("attempted_at"), utc=True, errors="coerce"
+    )
+    origin = bundle["forecast"].origin.iloc[0]
+    expected = now.tz_convert("Etc/GMT+5").tz_localize(None).normalize() - pd.Timedelta(
+        days=1
+    )
+    blocked = bundle["status"].get("publication_status") != "current"
+    stale = (
+        pd.isna(stamp)
+        or stamp > now
+        or (now - stamp) > pd.Timedelta(hours=26)
+        or origin != expected
+    )
+    if blocked:
+        return "Refresh blocked", bundle["status"].get(
+            "error", "The latest refresh did not publish a valid forecast."
+        )
+    if stale:
+        return (
+            "Historical snapshot",
+            "Forecast dates are no longer current. Treat these as archived predictions.",
+        )
+    label = (
+        "Current forecast"
+        if bundle["source"] == "Latest published reports"
+        else "Dated snapshot"
+    )
+    return label, "Forecast origin uses the latest completed fixed-EST day."
+
+
+def observed_series(bundle, history):
+    series = history[["Date", "AQI"]].copy()
+    series.Date = pd.to_datetime(series.Date)
+    observations = bundle.get("observations", pd.DataFrame())
+    if not observations.empty and {"Date", "AQI"} <= set(observations):
+        recent = observations[["Date", "AQI"]].copy()
+        recent.Date = pd.to_datetime(recent.Date)
+        series = pd.concat([series, recent], ignore_index=True)
+    series = series.drop_duplicates("Date", keep="last").set_index("Date").sort_index()
+    calendar = pd.date_range(series.index.min(), series.index.max(), name="Date")
+    return series.reindex(calendar).reset_index()
+
+
+def toronto_time(value):
+    return (
+        pd.to_datetime(value, utc=True)
+        .tz_convert(ZoneInfo("America/Toronto"))
+        .strftime("%b %d, %Y · %I:%M %p %Z")
+    )

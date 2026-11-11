@@ -1,0 +1,78 @@
+{
+  "sources": [
+    {
+      "archive": "forecast_weather.csv",
+      "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2024-01-01&end_date=2024-12-31&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cwind_speed_10m_previous_day1%2Csurface_pressure_previous_day1%2Ctemperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cwind_speed_10m_previous_day2%2Csurface_pressure_previous_day2%2Ctemperature_2m_previous_day3%2Crelative_humidity_2m_previous_day3%2Cwind_speed_10m_previous_day3%2Csurface_pressure_previous_day3%2Ctemperature_2m_previous_day4%2Crelative_humidity_2m_previous_day4%2Cwind_speed_10m_previous_day4%2Csurface_pressure_previous_day4%2Ctemperature_2m_previous_day5%2Crelative_humidity_2m_previous_day5%2Cwind_speed_10m_previous_day5%2Csurface_pressure_previous_day5%2Ctemperature_2m_previous_day6%2Crelative_humidity_2m_previous_day6%2Cwind_speed_10m_previous_day6%2Csurface_pressure_previous_day6%2Ctemperature_2m_previous_day7%2Crelative_humidity_2m_previous_day7%2Cwind_speed_10m_previous_day7%2Csurface_pressure_previous_day7&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+      "sha256": "0feb651c30cac59df5c97e5f7062b49f1d6f55f851eb2793a29f68902996888f",
+      "downloaded_at": "2026-10-31T17:20:45.725693+00:00",
+      "last_modified": null,
+      "bytes": 1311355
+    },
+    {
+      "archive": "forecast_weather.csv",
+      "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2025-01-01&end_date=2025-12-31&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cwind_speed_10m_previous_day1%2Csurface_pressure_previous_day1%2Ctemperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cwind_speed_10m_previous_day2%2Csurface_pressure_previous_day2%2Ctemperature_2m_previous_day3%2Crelative_humidity_2m_previous_day3%2Cwind_speed_10m_previous_day3%2Csurface_pressure_previous_day3%2Ctemperature_2m_previous_day4%2Crelative_humidity_2m_previous_day4%2Cwind_speed_10m_previous_day4%2Csurface_pressure_previous_day4%2Ctemperature_2m_previous_day5%2Crelative_humidity_2m_previous_day5%2Cwind_speed_10m_previous_day5%2Csurface_pressure_previous_day5%2Ctemperature_2m_previous_day6%2Crelative_humidity_2m_previous_day6%2Cwind_speed_10m_previous_day6%2Csurface_pressure_previous_day6%2Ctemperature_2m_previous_day7%2Crelative_humidity_2m_previous_day7%2Cwind_speed_10m_previous_day7%2Csurface_pressure_previous_day7&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+      "sha256": "132f8e5a5d6f24c4d88d0c0a3ac10ea0e237851ff9ac0b42cf1a5b60a53b6fd1",
+      "downloaded_at": "2026-10-31T17:20:51.796142+00:00",
+      "last_modified": null,
+      "bytes": 1314348
+    },
+    {
+      "archive": "forecast_weather.csv",
+      "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-01-01&end_date=2026-09-30&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cwind_speed_10m_previous_day1%2Csurface_pressure_previous_day1%2Ctemperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cwind_speed_10m_previous_day2%2Csurface_pressure_previous_day2%2Ctemperature_2m_previous_day3%2Crelative_humidity_2m_previous_day3%2Cwind_speed_10m_previous_day3%2Csurface_pressure_previous_day3%2Ctemperature_2m_previous_day4%2Crelative_humidity_2m_previous_day4%2Cwind_speed_10m_previous_day4%2Csurface_pressure_previous_day4%2Ctemperature_2m_previous_day5%2Crelative_humidity_2m_previous_day5%2Cwind_speed_10m_previous_day5%2Csurface_pressure_previous_day5%2Ctemperature_2m_previous_day6%2Crelative_humidity_2m_previous_day6%2Cwind_speed_10m_previous_day6%2Csurface_pressure_previous_day6%2Ctemperature_2m_previous_day7%2Crelative_humidity_2m_previous_day7%2Cwind_speed_10m_previous_day7%2Csurface_pressure_previous_day7&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+      "sha256": "51f0a64ec52ddc2d8b6777800ec324bde7800cbadfb6f95e34bf8839a8ae23d5",
+      "downloaded_at": "2026-10-31T17:20:57.814672+00:00",
+      "last_modified": null,
+      "bytes": 984892
+    },
+    {
+      "archive": "cams_daily.csv",
+      "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=43.709444&longitude=-79.5435&start_date=2022-08-01&end_date=2022-12-31&hourly=pm2_5%2Cozone%2Cnitrogen_dioxide%2Ccarbon_monoxide%2Caerosol_optical_depth%2Cdust&timezone=Etc%2FGMT%2B5",
+      "sha256": "18a404a2ef9402eeecc7c2850b16cef17d92ec9d9ffb0757f6ad8086346e6c45",
+      "downloaded_at": "2026-11-11",
+      "bytes": 177602
+    },
+    {
+      "archive": "cams_daily.csv",
+      "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=43.709444&longitude=-79.5435&start_date=2023-01-01&end_date=2023-12-31&hourly=pm2_5%2Cozone%2Cnitrogen_dioxide%2Ccarbon_monoxide%2Caerosol_optical_depth%2Cdust&timezone=Etc%2FGMT%2B5",
+      "sha256": "a51643754290de6598a9b4ac04c582bac5a5488752b3781d5107861e926d0618",
+      "downloaded_at": "2026-11-11",
+      "bytes": 424099
+    },
+    {
+      "archive": "cams_daily.csv",
+      "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=43.709444&longitude=-79.5435&start_date=2024-01-01&end_date=2024-12-31&hourly=pm2_5%2Cozone%2Cnitrogen_dioxide%2Ccarbon_monoxide%2Caerosol_optical_depth%2Cdust&timezone=Etc%2FGMT%2B5",
+      "sha256": "73636b2df8abcf69b069c7de28ab64ea2e49769f565948e8ed7e7faac7d5971c",
+      "downloaded_at": "2026-11-11",
+      "bytes": 424504
+    },
+    {
+      "archive": "cams_daily.csv",
+      "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=43.709444&longitude=-79.5435&start_date=2025-01-01&end_date=2025-12-31&hourly=pm2_5%2Cozone%2Cnitrogen_dioxide%2Ccarbon_monoxide%2Caerosol_optical_depth%2Cdust&timezone=Etc%2FGMT%2B5",
+      "sha256": "6a1977fadd4ca99709193a701c9950d313edf8814c1141a37d1b4b55826cfeb4",
+      "downloaded_at": "2026-11-11",
+      "bytes": 423201
+    },
+    {
+      "archive": "cams_daily.csv",
+      "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=43.709444&longitude=-79.5435&start_date=2026-01-01&end_date=2026-11-10&hourly=pm2_5%2Cozone%2Cnitrogen_dioxide%2Ccarbon_monoxide%2Caerosol_optical_depth%2Cdust&timezone=Etc%2FGMT%2B5",
+      "sha256": "9c4a6118b8d272693c0d1fb5a6af1d2f558917192162e8b2546c2b399e371648",
+      "downloaded_at": "2026-11-11",
+      "bytes": 364100
+    },
+    {
+      "archive": "forecast_weather.csv",
+      "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-10-01&end_date=2026-11-10&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cwind_speed_10m_previous_day1%2Csurface_pressure_previous_day1%2Ctemperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cwind_speed_10m_previous_day2%2Csurface_pressure_previous_day2%2Ctemperature_2m_previous_day3%2Crelative_humidity_2m_previous_day3%2Cwind_speed_10m_previous_day3%2Csurface_pressure_previous_day3%2Ctemperature_2m_previous_day4%2Crelative_humidity_2m_previous_day4%2Cwind_speed_10m_previous_day4%2Csurface_pressure_previous_day4%2Ctemperature_2m_previous_day5%2Crelative_humidity_2m_previous_day5%2Cwind_speed_10m_previous_day5%2Csurface_pressure_previous_day5%2Ctemperature_2m_previous_day6%2Crelative_humidity_2m_previous_day6%2Cwind_speed_10m_previous_day6%2Csurface_pressure_previous_day6%2Ctemperature_2m_previous_day7%2Crelative_humidity_2m_previous_day7%2Cwind_speed_10m_previous_day7%2Csurface_pressure_previous_day7&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+      "sha256": "398106425351f52baaf4cd05cf60be072b0062be5b5e54e6da24adc87cf61f64",
+      "downloaded_at": "2026-11-11T14:53:36.067245+00:00",
+      "last_modified": null,
+      "bytes": 150210
+    }
+  ],
+  "weather_end": "2026-11-10",
+  "cams_end": "2026-11-10",
+  "weather_sha256": "e9a1486c5c726be6c70936049d9e2023572d35fa3db63376a7f89f8cb06ab498",
+  "cams_sha256": "9cc275a034d7f8389dc88a10f3adf22e0adf2b672e2d427b10ff5c137b236457",
+  "updated_at": "2026-11-11T14:54:12.705219+00:00",
+  "attribution": "Weather and air-quality data by Open-Meteo.com (CC BY 4.0); air quality from CAMS (Copernicus Atmosphere Monitoring Service)",
+  "cams_caveat": "Archived CAMS values are near-term forecasts at every lead; back-tests that use them are an upper bound on live skill"
+}

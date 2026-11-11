@@ -9,9 +9,9 @@ import unittest
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from etl_contract import validate
+from airquality.contract import validate
 from tests.test_features import fixture
-from workflow import choose, evaluate, forward, tuning_grid
+from airquality.training import choose, evaluate, forward, tuning_grid
 
 
 class WorkflowTests(unittest.TestCase):
@@ -26,7 +26,6 @@ class WorkflowTests(unittest.TestCase):
         changed.loc[changed.index > boundary, "AQI"] = 900
         configs = [
             {"name": "ridge", "family": "ridge", "alpha": 1.0},
-            {"name": "AR", "family": "autoregression"},
             {"name": "persistence", "family": "persistence"},
         ]
         a, ma = evaluate(frame, boundary, frame.index[-1], configs, horizons=[1, 7])
@@ -110,7 +109,7 @@ class WorkflowTests(unittest.TestCase):
                     sys.executable,
                     "-O",
                     "-c",
-                    "from etl_contract import validate; import sys; validate(sys.argv[1], require_lock=False)",
+                    "from airquality.contract import validate; import sys; validate(sys.argv[1], require_lock=False)",
                     str(path),
                 ],
                 capture_output=True,
@@ -134,7 +133,7 @@ class WorkflowTests(unittest.TestCase):
             changed.loc[index, component] = 0.5
             with (
                 self.subTest(component=component),
-                patch("etl_contract.load_data", return_value=changed),
+                patch("airquality.contract.load_data", return_value=changed),
             ):
                 with self.assertRaisesRegex(ValueError, "sub-index"):
                     validate(path, require_lock=False)

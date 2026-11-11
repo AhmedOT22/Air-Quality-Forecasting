@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 import pandas as pd
 from tests.test_features import fixture
-from operations import (
+from airquality.operations import (
     HISTORY_COLUMNS,
     OBS_COLUMNS,
     PublicationBlocked,
@@ -143,27 +143,27 @@ class OperationsTests(unittest.TestCase):
 
     def test_real_issuance_clock_is_read_after_inference(self):
         from unittest.mock import patch
-        from workflow import forward
+        from airquality.training import forward
 
         events = []
 
-        def predict(frame, config):
+        def predict(frame, config, inputs=None):
             events.append("predict")
-            return forward(frame, config)
+            return forward(frame, config, inputs)
 
         def clock(value):
             events.append("clock")
             return self.now.tz_convert("UTC")
 
         with (
-            patch("operations.forward", side_effect=predict),
-            patch("operations.utc", side_effect=clock),
+            patch("airquality.operations.forward", side_effect=predict),
+            patch("airquality.operations.utc", side_effect=clock),
         ):
             issue(self.frame, CONFIG, {"input_sha256": "a"}, None, self.history, "code")
         self.assertEqual(events, ["predict", "clock"])
 
     def test_monitor_needs_samples_and_detects_deterioration(self):
-        from operations import monitor
+        from airquality.operations import monitor
 
         rows = pd.DataFrame(
             {
@@ -186,14 +186,15 @@ class OperationsTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from unittest.mock import patch
-        from operations import run
+        from airquality.operations import run
 
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder)
             previous = path / "latest_forecast.csv"
             previous.write_text("previous forecast remains historical\n")
             with patch(
-                "operations.validate", side_effect=ValueError("changed release")
+                "airquality.operations.validate",
+                side_effect=ValueError("changed release"),
             ):
                 with self.assertRaises(ValueError):
                     run(refresh=False, now=self.now, reports=path)
@@ -208,7 +209,7 @@ class OperationsTests(unittest.TestCase):
         import json
         import tempfile
         from pathlib import Path
-        from operations import run
+        from airquality.operations import run
 
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder)

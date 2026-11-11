@@ -29,7 +29,7 @@ jobs:
       - run: python -m unittest tests.test_dashboard -v
         env:
           AQI_DASHBOARD_OFFLINE: '1'
-  notebook:
+  pipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -41,5 +41,9 @@ jobs:
             requirements.txt
             requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
-      - run: python etl_contract.py
-      - run: python scripts/execute_notebook.py
+      - name: Verify the locked dataset
+        run: python -m airquality.contract
+      - name: Re-run the research pipeline
+        run: python -m airquality pipeline
+      - name: Re-run the notebook
+        run: python -m airquality notebook

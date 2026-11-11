@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from aqi import (
+from airquality.aqi import (
     concentration_index,
     daily_aqi,
     no2_index,
@@ -13,9 +13,9 @@ from aqi import (
     pm25_index,
     so2_index,
 )
-from features import make_features, seasonal_lag
+from airquality.features import make_features, seasonal_lag
 from tests.test_features import fixture
-from workflow import evaluate
+from airquality.training import evaluate
 
 
 def hourly_fixture():
@@ -140,7 +140,7 @@ class AQITests(unittest.TestCase):
         self.assertEqual(persistence, frame.AQI.iloc[-22])
 
     def test_gas_export_without_method_and_unpadded_station(self):
-        from aqi_data import read_hourly
+        from airquality.naps_aqi import read_hourly
         import csv, io
 
         stream = io.StringIO()

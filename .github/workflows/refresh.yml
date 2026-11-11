@@ -6,19 +6,10 @@ on:
   push:
     branches: [main]
     paths:
-      - operations.py
-      - aqi.py
-      - aqi_data.py
-      - data_sources.py
-      - extend_data.py
-      - etl_contract.py
-      - features.py
-      - workflow.py
-      - forecast_weather.py
-      - weather_model.py
-      - uncertainty.py
+      - airquality/**
       - requirements.txt
-      - reports/workflow/run.json
+      - data/processed/**
+      - reports/model/run.json
       - reports/uncertainty/**
       - .github/workflows/refresh.yml
 permissions:
@@ -40,8 +31,8 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: data/raw
-          key: raw-v1-${{ runner.os }}-${{ github.run_id }}
-          restore-keys: raw-v1-${{ runner.os }}-
+          key: raw-v2-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: raw-v2-${{ runner.os }}-
       - run: python -m unittest discover -s tests -q
       - name: Restore the operational ledger from the data branch
         run: |
@@ -50,7 +41,7 @@ jobs:
             git checkout FETCH_HEAD -- reports/operational
           fi
       - name: Refresh, check freshness, issue and score
-        run: python operations.py
+        run: python -m airquality refresh
       - name: Preserve input snapshot and diagnostics
         if: always()
         uses: actions/upload-artifact@v7
@@ -59,7 +50,7 @@ jobs:
           path: |
             data/operational/
             reports/operational/
-            data/raw/forecast_weather/
+            data/raw/forecast_inputs/
             reports/uncertainty/
           retention-days: 90
           if-no-files-found: warn

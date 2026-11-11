@@ -8,9 +8,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from extend_data import attach_weather, concatenate_hourly, read_ontario
-from features import validate_frame
-from features import load_data
+from airquality.extend import attach_weather, concatenate_hourly, read_ontario
+from airquality.features import validate_frame
+from airquality.features import load_data
 
 
 def ontario_fixture(rows):
@@ -118,8 +118,8 @@ class ExtensionTests(unittest.TestCase):
 
 class WeatherJoinTests(unittest.TestCase):
     def test_unpublished_latest_weather_keeps_station_and_fails_freshness(self):
-        from data_sources import WEATHER_FIELDS
-        from operations import freshness
+        from airquality.sources import WEATHER_FIELDS
+        from airquality.operations import freshness
 
         dates = pd.date_range("2026-01-01", periods=70, name="Date")
         daily = pd.DataFrame({"AQI": 30.0}, index=dates)

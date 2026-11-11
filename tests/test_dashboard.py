@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 import numpy as np
 import pandas as pd
-from dashboard_data import (
+from airquality.dashboard_data import (
     local_bundle,
     load_bundle,
     freshness,
@@ -47,7 +47,7 @@ class DashboardDataTests(unittest.TestCase):
 
     def test_unavailable_published_data_falls_back_with_notice(self):
         with patch(
-            "dashboard_data.published_bundle",
+            "airquality.dashboard_data.published_bundle",
             side_effect=OSError("network unavailable"),
         ):
             bundle = load_bundle(True)
@@ -55,7 +55,7 @@ class DashboardDataTests(unittest.TestCase):
         self.assertTrue(any("bundled snapshot" in w for w in bundle["warnings"]))
 
     def test_published_reports_prefer_data_branch_then_main(self):
-        import dashboard_data
+        from airquality import dashboard_data as dashboard_data
 
         requested = []
 
@@ -65,7 +65,7 @@ class DashboardDataTests(unittest.TestCase):
                 raise OSError("no data branch yet")
             raise OSError("stop after branch resolution")
 
-        with patch("dashboard_data.request", side_effect=fake_request):
+        with patch("airquality.dashboard_data.request", side_effect=fake_request):
             with self.assertRaises(OSError):
                 dashboard_data.published_bundle()
         self.assertTrue(requested[0].endswith("/git/ref/heads/data"))
@@ -161,10 +161,10 @@ class DashboardUITests(unittest.TestCase):
 
     def test_default_dashboard_and_horizon_and_challenger_controls(self):
         app = self.app()
-        self.assertEqual(len(app.metric), 4)
+        self.assertEqual(len(app.metric), 6)  # four headline cards, two alert scores
         self.assertEqual(
             [t.label for t in app.tabs],
-            ["Forecast outlook", "Observed history", "Performance", "About the model"],
+            ["Outlook", "Observed history", "How reliable is it?", "About the model"],
         )
         app.slider[0].set_value(3).run()
         app.toggle[1].set_value(True).run()
@@ -176,12 +176,12 @@ class DashboardUITests(unittest.TestCase):
         bundle = local_bundle()
         bundle["metrics"] = pd.DataFrame()
         bundle["status"]["prospective_scores"] = 0
-        with patch("dashboard_data.load_bundle", return_value=bundle):
+        with patch("airquality.dashboard_data.load_bundle", return_value=bundle):
             app = self.app()
         self.assertTrue(
             any("Waiting for observed outcomes" in info.value for info in app.info)
         )
-        self.assertTrue(any("rolling conformal 90%" in i.value for i in app.info))
+        self.assertTrue(any("likely range held" in c.value for c in app.caption))
         app.selectbox[0].select("All data since 2020").run()
         app.selectbox[1].select("Ozone").run()
         self.assertFalse(app.exception)
@@ -189,7 +189,7 @@ class DashboardUITests(unittest.TestCase):
     def test_live_accuracy_is_hidden_until_enough_scored_pairs(self):
         bundle = local_bundle()
         bundle["metrics"] = bundle["metrics"].assign(n=5)
-        with patch("dashboard_data.load_bundle", return_value=bundle):
+        with patch("airquality.dashboard_data.load_bundle", return_value=bundle):
             app = self.app()
         self.assertTrue(any("of 30 scored forecasts" in i.value for i in app.info))
         self.assertFalse(
@@ -200,7 +200,7 @@ class DashboardUITests(unittest.TestCase):
         bundle = local_bundle()
         self.assertFalse(bundle["metrics"].empty)
         bundle["metrics"] = bundle["metrics"].assign(n=30)
-        with patch("dashboard_data.load_bundle", return_value=bundle):
+        with patch("airquality.dashboard_data.load_bundle", return_value=bundle):
             app = self.app()
         self.assertTrue(
             any("Detailed prospective scores" in e.label for e in app.expander)
@@ -216,8 +216,29 @@ class DashboardUITests(unittest.TestCase):
         bundle = local_bundle()
         bundle["status"]["publication_status"] = "blocked"
         bundle["status"]["error"] = "Provider is unavailable"
-        with patch("dashboard_data.load_bundle", return_value=bundle):
+        with patch("airquality.dashboard_data.load_bundle", return_value=bundle):
             # app imports the function at execution time.
             app = self.app()
         self.assertTrue(any("Refresh blocked" in w.value for w in app.warning))
         self.assertFalse(app.exception)
+
+    def test_outlook_shows_chances_and_guidance_for_each_day(self):
+        app = self.app()
+        table = app.dataframe[0].value
+        self.assertIn("Chance above 50", table)
+        self.assertTrue(table["Chance above 50"].between(0, 1).all())
+        self.assertTrue(table["What to do"].str.len().gt(0).all())
+        self.assertTrue(any("Chance of Moderate" in m.label for m in app.metric))
+
+    def test_ledger_from_before_the_model_release_still_renders(self):
+        bundle = local_bundle()
+        forecast = bundle["forecast"]
+        bundle["forecast"] = forecast.assign(
+            model=forecast.model.replace(forecast.model.iloc[0], "ridge_1")
+        ).drop(columns=["p_moderate", "p_unhealthy_sensitive"])
+        with patch("airquality.dashboard_data.load_bundle", return_value=bundle):
+            app = self.app()
+        self.assertTrue(
+            any("predates the current model" in w.value for w in app.warning)
+        )
+        self.assertNotIn("Chance above 50", app.dataframe[0].value)

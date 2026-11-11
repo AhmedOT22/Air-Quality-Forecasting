@@ -1,0 +1,49 @@
+{
+  "model_version": "2.0",
+  "dataset_lock": {
+    "contract_version": 1,
+    "input": "daily_aqi_latest.csv",
+    "input_sha256": "95c2dd6d2f65233cad94382a3a73d2a9d2bb5766c947b9bc7d05c6df83d19b5b",
+    "manifest_sha256": "be0da81c848b6340322fd7c611749491b2a40c9d4a6e6a776c69a3b0d934e655",
+    "hourly_sha256": "83f8d703e0a9e41d958893d4ae811d911dde9b05cfd80ab1623beeb41619f83a",
+    "standard": "epa_2024",
+    "start": "2020-01-01",
+    "end": "2026-11-10"
+  },
+  "selected_config": {
+    "family": "boosting",
+    "features": "forecast",
+    "name": "boosting_forecast_leaf10",
+    "leaf": 10
+  },
+  "candidate_winner": {
+    "name": "boosting_forecast",
+    "family": "boosting",
+    "leaf": 20,
+    "features": "forecast"
+  },
+  "validation_years": [
+    2024,
+    2025
+  ],
+  "test_year": 2026,
+  "test_period": "2026-01-01/2026-11-09",
+  "selection_rule": "Lowest mean MAE with equal weight per validation year and horizon; CAMS candidates are reference only; the test year is excluded",
+  "horizons": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "seed": 42,
+  "caveats": [
+    "Design-stage experiments looked at 2025 and 2026 scores for four configurations before this protocol was fixed; the rule itself selects on 2024-2025 only",
+    "The weather-forecast archive starts in 2024; earlier training rows use observed weather as a stand-in, never rows that are scored",
+    "CAMS back-tests are an upper bound: archived values are near-term forecasts at every lead",
+    "2025 onward uses provisional Ontario observations",
+    "Daily AQI is final one day late; no future measurement is used"
+  ]
+}
