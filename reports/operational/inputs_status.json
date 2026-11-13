@@ -2,18 +2,18 @@
   "attribution": "Open-Meteo.com (CC BY 4.0); CAMS",
   "archive": "extended to the origin day",
   "weather_source": {
-    "url": "https://api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-11-12&end_date=2026-11-18&hourly=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Csurface_pressure&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
-    "sha256": "f87ea33935f910a2e7da1bc4840f393524f1c0aa69572d6ef429642edc378b39",
-    "downloaded_at": "2026-11-12T18:56:11.715607+00:00",
+    "url": "https://api.open-meteo.com/v1/forecast?latitude=43.67667&longitude=-79.63056&start_date=2026-11-13&end_date=2026-11-19&hourly=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Csurface_pressure&timezone=Etc%2FGMT%2B5&wind_speed_unit=kmh",
+    "sha256": "907079003ec5f596010eea82fed350022095c74fe3f04ddf876ebcceb8228b77",
+    "downloaded_at": "2026-11-13T18:32:46.428310+00:00",
     "last_modified": null,
-    "bytes": 6700
+    "bytes": 6725
   },
   "cams_source": {
     "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=43.709444&longitude=-79.5435&hourly=pm2_5%2Cozone%2Caerosol_optical_depth&timezone=Etc%2FGMT%2B5&forecast_days=7",
-    "sha256": "3663c2dfae6e9f4914768cf096a10cf16bb48fb4382c7ba560dc763302e03551",
-    "downloaded_at": "2026-11-12T18:56:12.189595+00:00",
+    "sha256": "8bb87ea2e1fdb2514fa103b38ee431d2f16cc6b19a46935109e1a1ee869f0312",
+    "downloaded_at": "2026-11-13T18:32:46.892249+00:00",
     "last_modified": null,
-    "bytes": 5946
+    "bytes": 5959
   },
   "challenger": "issued"
 }
