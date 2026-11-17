@@ -1,5 +1,5 @@
 {
-  "attempted_at": "2026-11-16T21:02:26.868486+00:00",
+  "attempted_at": "2026-11-17T19:51:20.591739+00:00",
   "publication_status": "blocked",
   "contract_version": 1,
   "error": "PublicationBlocked: Latest origin lacks required AQI history; no stale-origin fallback"
