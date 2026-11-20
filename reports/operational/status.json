@@ -1,6 +1,6 @@
 {
-  "attempted_at": "2026-11-19T19:29:37.234489+00:00",
+  "attempted_at": "2026-11-20T19:06:45.987148+00:00",
   "publication_status": "blocked",
   "contract_version": 1,
-  "error": "PublicationBlocked: Latest origin lacks required AQI history; no stale-origin fallback"
+  "error": "PublicationBlocked: Latest completed-day weather is incomplete; no new forecast issued"
 }
