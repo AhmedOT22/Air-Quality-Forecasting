@@ -1,6 +1,12 @@
 {
-  "attempted_at": "2026-11-27T19:57:20.793122+00:00",
-  "publication_status": "blocked",
+  "attempted_at": "2026-11-28T18:57:15.460725+00:00",
+  "publication_status": "current",
   "contract_version": 1,
-  "error": "PublicationBlocked: Latest origin lacks required AQI history; no stale-origin fallback"
+  "origin": "2026-11-27",
+  "pollution_age_hours": 0.959436305,
+  "issued_rows": 14,
+  "prospective_scores": 162,
+  "challenger_status": "issued",
+  "input_sha256": "dad2709bb4fc05b7f4f3197394c86a016a25ecf6242ff35447f33e57f4116c0d",
+  "note": "First issuance retained; same-day forecasts excluded from prospective metrics; unverified truth can be revised"
 }
